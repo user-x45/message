@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>らくがき伝言 - Gartic Phone Clone</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== ヘッダー ===== -->
+  <header class="topbar">
+    <div class="brand">✏️ らくがき伝言</div>
+    <div class="room-badge" id="roomBadge" hidden>部屋: <span id="roomCodeLabel"></span></div>
+  </header>
+
+  <!-- ===== ホーム画面 ===== -->
+  <section id="screen-home" class="screen">
+    <div class="card home-card">
+      <h1>らくがき伝言</h1>
+      <p class="lead">「絵しりとり × 伝言ゲーム」。お題を書いて、次の人が絵にして、また次の人が推理して文章にする…最後にどう変化したかみんなで見て笑おう。</p>
+
+      <label class="small-label">あなたの名前</label>
+      <input id="nameInput" type="text" placeholder="なまえ" maxlength="20">
+
+      <div class="home-actions">
+        <button id="btnCreate" class="btn btn-primary">🎉 部屋を作る（ホスト）</button>
+
+        <div class="divider"><span>または</span></div>
+
+        <label class="small-label">招待コード</label>
+        <input id="codeInput" type="text" placeholder="例: AB12CD" maxlength="10" style="text-transform:uppercase">
+        <button id="btnJoin" class="btn btn-secondary">🚪 コードで参加する</button>
+      </div>
+      <p id="homeError" class="error-text" hidden></p>
+    </div>
+  </section>
+
+  <!-- ===== ロビー画面 ===== -->
+  <section id="screen-lobby" class="screen" hidden>
+    <div class="card">
+      <h2>ロビー</h2>
+      <div class="invite-box">
+        <div class="invite-row">
+          <span class="small-label">招待リンク</span>
+          <div class="copy-row">
+            <input id="inviteLinkInput" type="text" readonly>
+            <button id="btnCopyLink" class="btn btn-small">リンクをコピー</button>
+          </div>
+        </div>
+        <div class="invite-row">
+          <span class="small-label">招待コード</span>
+          <div class="copy-row">
+            <div id="inviteCodeDisplay" class="invite-code"></div>
+            <button id="btnCopyCode" class="btn btn-small">コードをコピー</button>
+          </div>
+        </div>
+      </div>
+
+      <h3>参加者 <span id="playerCount"></span></h3>
+      <ul id="playerList" class="player-list"></ul>
+
+      <div id="hostControls" class="host-controls" hidden>
+        <div class="settings-row">
+          <label>お絵描き時間(秒)
+            <input id="drawSecondsInput" type="number" min="15" max="300" value="70">
+          </label>
+          <label>文章時間(秒)
+            <input id="writeSecondsInput" type="number" min="10" max="180" value="45">
+          </label>
+        </div>
+        <button id="btnStart" class="btn btn-primary">▶ ゲーム開始（2人以上）</button>
+      </div>
+      <p id="lobbyNote" class="hint">ホストが開始するのを待っています…</p>
+    </div>
+  </section>
+
+  <!-- ===== プレイ画面: 文章入力 ===== -->
+  <section id="screen-write" class="screen" hidden>
+    <div class="card">
+      <div class="turn-header">
+        <span id="roundLabel"></span>
+        <span id="timerLabel" class="timer">--</span>
+      </div>
+      <div id="promptDrawingWrap" class="prompt-drawing-wrap" hidden>
+        <p class="hint">この絵は何？ 見たままを文章で書こう。</p>
+        <img id="promptDrawingImg" class="prompt-drawing-img">
+      </div>
+      <div id="promptFirstWrap" hidden>
+        <p class="hint">最初のお題を自由に書いてください（例: 「空を飛ぶゾウ」）</p>
+      </div>
+      <textarea id="writeInput" maxlength="120" placeholder="ここに入力…" rows="3"></textarea>
+      <div class="char-count"><span id="writeCharCount">0</span>/120</div>
+      <button id="btnSubmitText" class="btn btn-primary">送信する</button>
+    </div>
+  </section>
+
+  <!-- ===== プレイ画面: お絵描き ===== -->
+  <section id="screen-draw" class="screen" hidden>
+    <div class="card">
+      <div class="turn-header">
+        <span id="roundLabelDraw"></span>
+        <span id="timerLabelDraw" class="timer">--</span>
+      </div>
+      <div class="prompt-text-wrap">
+        <p class="hint">このお題を絵にしよう：</p>
+        <p id="promptTextValue" class="prompt-text"></p>
+      </div>
+
+      <div class="canvas-toolbar">
+        <input id="colorPicker" type="color" value="#222222" title="色">
+        <input id="brushSize" type="range" min="1" max="24" value="4" title="太さ">
+        <button id="btnUndo" class="btn btn-tiny">戻す</button>
+        <button id="btnClear" class="btn btn-tiny">全消し</button>
+      </div>
+      <canvas id="drawCanvas" width="600" height="420"></canvas>
+      <button id="btnSubmitDrawing" class="btn btn-primary">🖌 送信する</button>
+    </div>
+  </section>
+
+  <!-- ===== 待機画面 ===== -->
+  <section id="screen-waiting" class="screen" hidden>
+    <div class="card center-card">
+      <div class="spinner"></div>
+      <h2>送信しました！</h2>
+      <p class="hint">他のプレイヤーの入力を待っています… (<span id="waitingCount"></span>)</p>
+    </div>
+  </section>
+
+  <!-- ===== 結果発表画面 ===== -->
+  <section id="screen-reveal" class="screen" hidden>
+    <div class="card">
+      <h2 id="revealChainOwner">結果発表</h2>
+      <div id="revealTrack" class="reveal-track"></div>
+      <div class="reveal-nav">
+        <button id="btnRevealPrevChain" class="btn btn-small">◀ 前のチェーン</button>
+        <span id="revealChainIndicator"></span>
+        <button id="btnRevealNextChain" class="btn btn-small">次のチェーン ▶</button>
+      </div>
+      <div id="revealHostControls" hidden>
+        <button id="btnRestart" class="btn btn-secondary">🔁 もう一度遊ぶ（ロビーへ戻る）</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
