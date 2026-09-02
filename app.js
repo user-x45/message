@@ -1,7 +1,7 @@
 // ===== 管理者設定 =====
 // デプロイしたCloudflare WorkersのURLをここに直接書き換えてください。
 // 例: "https://gartic-clone.yourname.workers.dev"
-const WORKER_URL = "https://gartic-clone.yourname.workers.dev";
+const WORKER_URL = "https://message-server.user-x45.workers.dev";
 
 // ===== 基本ユーティリティ =====
 const $ = (id) => document.getElementById(id);
