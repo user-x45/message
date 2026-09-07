@@ -3,150 +3,1350 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>らくがき伝言 - Gartic Phone Clone</title>
-<link rel="stylesheet" href="style.css">
+<title>お絵描き伝言ゲーム</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+  :root {
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --surface2: #0f3460;
+    --accent: #e94560;
+    --accent2: #f5a623;
+    --accent3: #4ecdc4;
+    --text: #eaeaea;
+    --text-muted: #8b9ab0;
+    --border: rgba(255,255,255,0.1);
+    --radius: 12px;
+    --canvas-bg: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ===== Header ===== */
+  header {
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+  .code-badge {
+    margin-left: auto;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .code-badge strong { color: var(--accent2); letter-spacing: 2px; font-size: 1rem; }
+
+  /* ===== Main ===== */
+  main {
+    width: 100%;
+    max-width: 860px;
+    padding: 32px 16px;
+    flex: 1;
+  }
+
+  /* ===== Screens ===== */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ===== Home screen ===== */
+  .hero {
+    text-align: center;
+    padding: 48px 0 40px;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+  .hero p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    margin-bottom: 40px;
+  }
+
+  .home-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  @media (max-width: 500px) { .home-actions { grid-template-columns: 1fr; } }
+
+  .action-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    text-align: center;
+  }
+  .action-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .action-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .action-card h2 { font-size: 1.1rem; margin-bottom: 6px; }
+  .action-card p { font-size: 0.85rem; color: var(--text-muted); }
+
+  /* ===== Form card ===== */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+  .form-card h2 { font-size: 1.3rem; margin-bottom: 24px; }
+
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .field input, .field select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .field select option { background: var(--surface); }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-success { background: var(--accent3); color: #1a1a2e; }
+  .btn-full { width: 100%; }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--text); }
+
+  /* ===== Lobby ===== */
+  .lobby-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .lobby-header h2 { font-size: 1.3rem; }
+
+  .invite-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .invite-box h3 { font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .invite-code {
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--accent2);
+    margin-bottom: 12px;
+  }
+  .invite-url {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    word-break: break-all;
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    font-family: monospace;
+  }
+  .copy-row { display: flex; gap: 8px; }
+
+  .player-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .player-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .player-chip .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent2);
+    flex-shrink: 0;
+  }
+  .player-chip.host { border-color: var(--accent2); }
+  .player-chip.me { border-color: var(--accent3); }
+
+  /* ===== Drawing screen ===== */
+  .drawing-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .drawing-header h2 { font-size: 1.1rem; }
+  .turn-badge {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .topic-display {
+    background: var(--surface);
+    border: 2px solid var(--accent2);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topic-display .label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .topic-display .value { font-weight: 700; color: var(--accent2); }
+
+  .ref-image-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+  .ref-image-box p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+  .ref-image-box img { max-width: 100%; border-radius: 6px; display: block; }
+
+  /* ===== Canvas toolbar ===== */
+  .canvas-wrap {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .tool-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 4px 8px;
+  }
+  .tool-group label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* Color swatches */
+  .color-swatches {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.1s;
+    flex-shrink: 0;
+  }
+  .swatch:hover { transform: scale(1.15); }
+  .swatch.active { border-color: #fff; transform: scale(1.15); }
+
+  /* Size slider */
+  input[type=range] {
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    width: 80px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .tool-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--text);
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .tool-btn:hover { background: var(--surface); }
+  .tool-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  canvas {
+    display: block;
+    border-radius: 6px;
+    cursor: crosshair;
+    touch-action: none;
+    width: 100%;
+    background: #ffffff;
+  }
+
+  /* ===== Waiting screen ===== */
+  .waiting-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .waiting-icon { font-size: 3rem; margin-bottom: 16px; }
+  .waiting-box h2 { font-size: 1.2rem; margin-bottom: 8px; }
+  .waiting-box p { color: var(--text-muted); margin-bottom: 24px; }
+  .progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 24px;
+  }
+  .step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: all 0.3s;
+  }
+  .step-dot.done { background: var(--accent3); border-color: var(--accent3); color: #1a1a2e; }
+  .step-dot.current { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-line {
+    height: 2px;
+    width: 32px;
+    background: var(--surface2);
+  }
+  .step-line.done { background: var(--accent3); }
+
+  /* ===== Guess screen ===== */
+  .guess-section { max-width: 560px; margin: 0 auto; }
+  .guess-section h2 { font-size: 1.2rem; margin-bottom: 8px; }
+  .guess-section p { color: var(--text-muted); margin-bottom: 20px; }
+
+  /* ===== Result screen ===== */
+  .result-reveal {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .result-reveal .verdict {
+    font-size: 3rem;
+    margin-bottom: 8px;
+  }
+  .result-reveal h2 { font-size: 1.5rem; margin-bottom: 6px; }
+  .result-reveal .topic-chip {
+    display: inline-block;
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 4px 14px;
+    color: var(--accent2);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  .result-reveal .guess-chip {
+    display: inline-block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 14px;
+    color: var(--text);
+    font-size: 1rem;
+  }
+  .correct-badge { color: var(--accent3); }
+  .wrong-badge { color: var(--accent); }
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .timeline-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .timeline-item .who {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .timeline-item .who strong { color: var(--text); }
+  .timeline-item img {
+    max-width: 100%;
+    border-radius: 6px;
+    display: block;
+    background: #fff;
+  }
+
+  /* ===== Toasts ===== */
+  #toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+  }
+  .toast {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 0.9rem;
+    animation: slideUp 0.2s ease;
+    max-width: 280px;
+  }
+  .toast.success { border-color: var(--accent3); }
+  .toast.error { border-color: var(--accent); }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Spinner ===== */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    display: none;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 32px 48px;
+    text-align: center;
+  }
+  .loading-card .spinner { width: 36px; height: 36px; margin-bottom: 12px; }
+</style>
 </head>
 <body>
 
-<div id="app">
+<header>
+  <div class="logo">お絵<span>描き</span>伝言ゲーム</div>
+  <div class="code-badge" id="header-code" style="display:none">
+    コード: <strong id="header-code-text"></strong>
+  </div>
+</header>
 
-  <!-- ===== ヘッダー ===== -->
-  <header class="topbar">
-    <div class="brand">✏️ らくがき伝言</div>
-    <div class="room-badge" id="roomBadge" hidden>部屋: <span id="roomCodeLabel"></span></div>
-  </header>
+<main>
 
-  <!-- ===== ホーム画面 ===== -->
-  <section id="screen-home" class="screen">
-    <div class="card home-card">
-      <h1>らくがき伝言</h1>
-      <p class="lead">「絵しりとり × 伝言ゲーム」。お題を書いて、次の人が絵にして、また次の人が推理して文章にする…最後にどう変化したかみんなで見て笑おう。</p>
-
-      <label class="small-label">あなたの名前</label>
-      <input id="nameInput" type="text" placeholder="なまえ" maxlength="20">
-
-      <div class="home-actions">
-        <button id="btnCreate" class="btn btn-primary">🎉 部屋を作る（ホスト）</button>
-
-        <div class="divider"><span>または</span></div>
-
-        <label class="small-label">招待コード</label>
-        <input id="codeInput" type="text" placeholder="例: AB12CD" maxlength="10" style="text-transform:uppercase">
-        <button id="btnJoin" class="btn btn-secondary">🚪 コードで参加する</button>
-      </div>
-      <p id="homeError" class="error-text" hidden></p>
+  <!-- ===== Home ===== -->
+  <div class="screen active" id="screen-home">
+    <div class="hero">
+      <h1>🎨 お絵描き<br><em>伝言ゲーム</em></h1>
+      <p>絵で伝える、絵で当てる。みんなでワイワイ楽しもう！</p>
     </div>
-  </section>
-
-  <!-- ===== ロビー画面 ===== -->
-  <section id="screen-lobby" class="screen" hidden>
-    <div class="card">
-      <h2>ロビー</h2>
-      <div class="invite-box">
-        <div class="invite-row">
-          <span class="small-label">招待リンク</span>
-          <div class="copy-row">
-            <input id="inviteLinkInput" type="text" readonly>
-            <button id="btnCopyLink" class="btn btn-small">リンクをコピー</button>
-          </div>
-        </div>
-        <div class="invite-row">
-          <span class="small-label">招待コード</span>
-          <div class="copy-row">
-            <div id="inviteCodeDisplay" class="invite-code"></div>
-            <button id="btnCopyCode" class="btn btn-small">コードをコピー</button>
-          </div>
-        </div>
+    <div class="home-actions">
+      <div class="action-card" onclick="showScreen('screen-create')">
+        <div class="icon">🏠</div>
+        <h2>ゲームを作る</h2>
+        <p>ホストとしてお題を決めてゲームを始める</p>
       </div>
-
-      <h3>参加者 <span id="playerCount"></span></h3>
-      <ul id="playerList" class="player-list"></ul>
-
-      <div id="hostControls" class="host-controls" hidden>
-        <div class="settings-row">
-          <label>お絵描き時間(秒)
-            <input id="drawSecondsInput" type="number" min="15" max="300" value="70">
-          </label>
-          <label>文章時間(秒)
-            <input id="writeSecondsInput" type="number" min="10" max="180" value="45">
-          </label>
-        </div>
-        <button id="btnStart" class="btn btn-primary">▶ ゲーム開始（2人以上）</button>
+      <div class="action-card" onclick="showScreen('screen-join')">
+        <div class="icon">🚪</div>
+        <h2>参加する</h2>
+        <p>招待コードまたはURLで友達のゲームに参加する</p>
       </div>
-      <p id="lobbyNote" class="hint">ホストが開始するのを待っています…</p>
     </div>
-  </section>
+  </div>
 
-  <!-- ===== プレイ画面: 文章入力 ===== -->
-  <section id="screen-write" class="screen" hidden>
-    <div class="card">
-      <div class="turn-header">
-        <span id="roundLabel"></span>
-        <span id="timerLabel" class="timer">--</span>
+  <!-- ===== Create ===== -->
+  <div class="screen" id="screen-create">
+    <button class="back-btn" onclick="showScreen('screen-home')">← 戻る</button>
+    <div class="form-card">
+      <h2>🏠 ゲームを作る</h2>
+      <div class="field">
+        <label>あなたの名前</label>
+        <input type="text" id="create-name" placeholder="例: たろう" maxlength="12">
       </div>
-      <div id="promptDrawingWrap" class="prompt-drawing-wrap" hidden>
-        <p class="hint">この絵は何？ 見たままを文章で書こう。</p>
-        <img id="promptDrawingImg" class="prompt-drawing-img">
+      <div class="field">
+        <label>最大人数</label>
+        <select id="create-max">
+          <option value="3">3人</option>
+          <option value="4">4人</option>
+          <option value="5">5人</option>
+          <option value="6">6人</option>
+          <option value="8" selected>8人</option>
+          <option value="10">10人</option>
+        </select>
       </div>
-      <div id="promptFirstWrap" hidden>
-        <p class="hint">最初のお題を自由に書いてください（例: 「空を飛ぶゾウ」）</p>
-      </div>
-      <textarea id="writeInput" maxlength="120" placeholder="ここに入力…" rows="3"></textarea>
-      <div class="char-count"><span id="writeCharCount">0</span>/120</div>
-      <button id="btnSubmitText" class="btn btn-primary">送信する</button>
+      <button class="btn btn-primary btn-full" onclick="createGame()">部屋を作る →</button>
     </div>
-  </section>
+  </div>
 
-  <!-- ===== プレイ画面: お絵描き ===== -->
-  <section id="screen-draw" class="screen" hidden>
-    <div class="card">
-      <div class="turn-header">
-        <span id="roundLabelDraw"></span>
-        <span id="timerLabelDraw" class="timer">--</span>
+  <!-- ===== Join ===== -->
+  <div class="screen" id="screen-join">
+    <button class="back-btn" onclick="showScreen('screen-home')">← 戻る</button>
+    <div class="form-card">
+      <h2>🚪 ゲームに参加する</h2>
+      <div class="field">
+        <label>招待コード (6文字)</label>
+        <input type="text" id="join-code" placeholder="例: ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:1.3rem">
       </div>
-      <div class="prompt-text-wrap">
-        <p class="hint">このお題を絵にしよう：</p>
-        <p id="promptTextValue" class="prompt-text"></p>
+      <div class="field">
+        <label>あなたの名前</label>
+        <input type="text" id="join-name" placeholder="例: はなこ" maxlength="12">
       </div>
-
-      <div class="canvas-toolbar">
-        <input id="colorPicker" type="color" value="#222222" title="色">
-        <input id="brushSize" type="range" min="1" max="24" value="4" title="太さ">
-        <button id="btnUndo" class="btn btn-tiny">戻す</button>
-        <button id="btnClear" class="btn btn-tiny">全消し</button>
-      </div>
-      <canvas id="drawCanvas" width="600" height="420"></canvas>
-      <button id="btnSubmitDrawing" class="btn btn-primary">🖌 送信する</button>
+      <button class="btn btn-primary btn-full" onclick="joinGame()">参加する →</button>
     </div>
-  </section>
+  </div>
 
-  <!-- ===== 待機画面 ===== -->
-  <section id="screen-waiting" class="screen" hidden>
-    <div class="card center-card">
+  <!-- ===== Lobby ===== -->
+  <div class="screen" id="screen-lobby">
+    <div class="lobby-header">
+      <h2 id="lobby-title">ロビー</h2>
+      <span id="lobby-player-count" class="turn-badge">0人参加中</span>
+    </div>
+
+    <div class="invite-box">
+      <h3>招待する</h3>
+      <div class="invite-code" id="lobby-code"></div>
+      <div class="invite-url" id="lobby-url"></div>
+      <div class="copy-row">
+        <button class="btn btn-secondary" onclick="copyCode()">コードをコピー</button>
+        <button class="btn btn-secondary" onclick="copyUrl()">URLをコピー</button>
+      </div>
+    </div>
+
+    <div class="player-list" id="player-list"></div>
+
+    <!-- ホスト用: お題入力と最初の絵を描く -->
+    <div id="host-section" style="display:none">
+      <div class="field">
+        <label>お題を入力してください</label>
+        <input type="text" id="topic-input" placeholder="例: ねこ、富士山、ラーメン..." maxlength="20">
+      </div>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">お題を入力したら、その絵を描いてください。参加者には絵だけが見え、お題は秘密です。</p>
+      <div id="host-canvas-area"></div>
+      <button class="btn btn-primary btn-full" id="start-btn" onclick="startGame()" disabled>ゲームを開始して絵を送る →</button>
+    </div>
+
+    <div id="guest-waiting" style="display:none">
+      <div class="waiting-box">
+        <div class="waiting-icon">⏳</div>
+        <h2>ホストの準備を待っています</h2>
+        <p>ホストがお題を決めてゲームを始めるまでお待ちください。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Drawing (参加者が絵を描く) ===== -->
+  <div class="screen" id="screen-drawing">
+    <div class="drawing-header">
+      <h2>✏️ 絵を描こう</h2>
+      <span class="turn-badge" id="drawing-turn-badge">あなたの番です</span>
+    </div>
+
+    <div class="ref-image-box" id="ref-image-box" style="display:none">
+      <p>前の人が描いた絵を参考に、同じものを描いてください</p>
+      <img id="ref-image" src="" alt="前の人の絵">
+    </div>
+
+    <div id="drawing-canvas-area"></div>
+    <button class="btn btn-success btn-full" id="submit-drawing-btn" onclick="submitDrawing()" style="margin-top:12px">
+      絵を送る →
+    </button>
+  </div>
+
+  <!-- ===== Waiting for others ===== -->
+  <div class="screen" id="screen-waiting">
+    <div class="waiting-box">
+      <div class="waiting-icon">🎨</div>
+      <h2>提出しました！次の人を待っています</h2>
+      <p id="waiting-msg">他の参加者が絵を描いています...</p>
+      <div class="progress-steps" id="progress-steps"></div>
       <div class="spinner"></div>
-      <h2>送信しました！</h2>
-      <p class="hint">他のプレイヤーの入力を待っています… (<span id="waitingCount"></span>)</p>
     </div>
-  </section>
+  </div>
 
-  <!-- ===== 結果発表画面 ===== -->
-  <section id="screen-reveal" class="screen" hidden>
-    <div class="card">
-      <h2 id="revealChainOwner">結果発表</h2>
-      <div id="revealTrack" class="reveal-track"></div>
-      <div class="reveal-nav">
-        <button id="btnRevealPrevChain" class="btn btn-small">◀ 前のチェーン</button>
-        <span id="revealChainIndicator"></span>
-        <button id="btnRevealNextChain" class="btn btn-small">次のチェーン ▶</button>
+  <!-- ===== Guess ===== -->
+  <div class="screen" id="screen-guess">
+    <div class="guess-section">
+      <h2>🔍 お題を当てよう！</h2>
+      <p>最後の絵を見て、最初のお題が何だったか当ててください。</p>
+      <div class="ref-image-box">
+        <p>最後に届いた絵</p>
+        <img id="guess-image" src="" alt="最後の絵">
       </div>
-      <div id="revealHostControls" hidden>
-        <button id="btnRestart" class="btn btn-secondary">🔁 もう一度遊ぶ（ロビーへ戻る）</button>
+      <div class="field">
+        <label>あなたの答え</label>
+        <input type="text" id="guess-input" placeholder="お題を入力..." maxlength="20">
       </div>
+      <button class="btn btn-success btn-full" onclick="submitGuess()">答えを送る →</button>
     </div>
-  </section>
+  </div>
 
+  <!-- ===== Result ===== -->
+  <div class="screen" id="screen-result">
+    <div class="result-reveal" id="result-reveal"></div>
+    <div class="timeline" id="timeline"></div>
+    <div style="text-align:center">
+      <button class="btn btn-primary" onclick="showScreen('screen-home');resetGame()">🏠 トップに戻る</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-card">
+    <div class="spinner"></div>
+    <div id="loading-text">処理中...</div>
+  </div>
 </div>
 
-<script src="app.js"></script>
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+// ============================================================
+// CONFIG — デプロイ後にWorkerのURLを書き換えてください
+// ============================================================
+const API_BASE = 'https://oekaki-dengen.YOUR_SUBDOMAIN.workers.dev';
+
+// ============================================================
+// State
+// ============================================================
+let state = {
+  code: null,
+  playerId: null,
+  playerName: null,
+  isHost: false,
+  pollTimer: null,
+};
+
+let hostCanvas = null;   // ロビー用キャンバス (ホスト)
+let drawCanvas = null;   // 参加者用キャンバス
+
+// ============================================================
+// Routing — URL から招待コードを読む
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  if (code && /^[A-Z0-9]{6}$/.test(code.toUpperCase())) {
+    document.getElementById('join-code').value = code.toUpperCase();
+    showScreen('screen-join');
+  }
+});
+
+// ============================================================
+// Screen management
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ============================================================
+// API helpers
+// ============================================================
+async function api(method, path, body) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const resp = await fetch(API_BASE + path, opts);
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.error || 'API error');
+  return data;
+}
+
+// ============================================================
+// Toast
+// ============================================================
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ============================================================
+// Loading
+// ============================================================
+function setLoading(show, text = '処理中...') {
+  document.getElementById('loading-overlay').classList.toggle('show', show);
+  document.getElementById('loading-text').textContent = text;
+}
+
+// ============================================================
+// Canvas builder
+// ============================================================
+function buildCanvas(container, width = 680, height = 420) {
+  container.innerHTML = '';
+
+  // Toolbar
+  const toolbar = document.createElement('div');
+  toolbar.className = 'toolbar';
+
+  // Colors
+  const colors = [
+    '#000000','#ffffff','#ef4444','#f97316','#f59e0b',
+    '#22c55e','#3b82f6','#8b5cf6','#ec4899','#6b7280',
+    '#78350f','#1e3a8a',
+  ];
+  const swatchGroup = document.createElement('div');
+  swatchGroup.className = 'tool-group';
+  const swatchLabel = document.createElement('label');
+  swatchLabel.textContent = '色';
+  swatchGroup.appendChild(swatchLabel);
+
+  const swatchRow = document.createElement('div');
+  swatchRow.className = 'color-swatches';
+  let currentColor = '#000000';
+
+  colors.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch' + (c === currentColor ? ' active' : '');
+    sw.style.background = c;
+    if (c === '#ffffff') sw.style.border = '2px solid #555';
+    sw.onclick = () => {
+      currentColor = c;
+      currentTool = 'pen';
+      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+      sw.classList.add('active');
+      eraserBtn.classList.remove('active');
+    };
+    swatchRow.appendChild(sw);
+  });
+  swatchGroup.appendChild(swatchRow);
+  toolbar.appendChild(swatchGroup);
+
+  // Size
+  const sizeGroup = document.createElement('div');
+  sizeGroup.className = 'tool-group';
+  const sizeLabel = document.createElement('label');
+  sizeLabel.textContent = '太さ';
+  sizeGroup.appendChild(sizeLabel);
+  const sizeSlider = document.createElement('input');
+  sizeSlider.type = 'range'; sizeSlider.min = 1; sizeSlider.max = 40; sizeSlider.value = 4;
+  sizeGroup.appendChild(sizeSlider);
+  toolbar.appendChild(sizeGroup);
+
+  // Tools
+  const toolGroup = document.createElement('div');
+  toolGroup.className = 'tool-group';
+  let currentTool = 'pen';
+
+  const penBtn = document.createElement('button');
+  penBtn.className = 'tool-btn active';
+  penBtn.innerHTML = '✏️ ペン';
+  penBtn.onclick = () => {
+    currentTool = 'pen';
+    penBtn.classList.add('active');
+    eraserBtn.classList.remove('active');
+    document.querySelectorAll('.swatch').forEach((s,i) => {
+      if (colors[i] === currentColor) s.classList.add('active');
+    });
+  };
+
+  const eraserBtn = document.createElement('button');
+  eraserBtn.className = 'tool-btn';
+  eraserBtn.innerHTML = '🧹 消しゴム';
+  eraserBtn.onclick = () => {
+    currentTool = 'eraser';
+    eraserBtn.classList.add('active');
+    penBtn.classList.remove('active');
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  };
+
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'tool-btn';
+  clearBtn.innerHTML = '🗑️ 全消し';
+  clearBtn.onclick = () => {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  };
+
+  toolGroup.appendChild(penBtn);
+  toolGroup.appendChild(eraserBtn);
+  toolGroup.appendChild(clearBtn);
+  toolbar.appendChild(toolGroup);
+  container.appendChild(toolbar);
+
+  // Canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = 680;
+  canvas.height = 420;
+  container.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Drawing logic
+  let drawing = false;
+  let lastX = 0, lastY = 0;
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    if (e.touches) {
+      return [
+        (e.touches[0].clientX - rect.left) * scaleX,
+        (e.touches[0].clientY - rect.top) * scaleY,
+      ];
+    }
+    return [(e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY];
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    drawing = true;
+    [lastX, lastY] = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+  }
+
+  function draw(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    const [x, y] = getPos(e);
+    ctx.lineWidth = parseInt(sizeSlider.value);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (currentTool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.strokeStyle = 'rgba(0,0,0,1)';
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = currentColor;
+    }
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    lastX = x; lastY = y;
+  }
+
+  function stopDraw(e) {
+    if (e) e.preventDefault();
+    drawing = false;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDraw);
+  canvas.addEventListener('mouseleave', stopDraw);
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove', draw, { passive: false });
+  canvas.addEventListener('touchend', stopDraw, { passive: false });
+
+  // validate topic when host typing (enable start btn)
+  if (container.id === 'host-canvas-area') {
+    document.getElementById('topic-input').addEventListener('input', checkHostReady);
+  }
+
+  return canvas;
+}
+
+function checkHostReady() {
+  const topic = document.getElementById('topic-input').value.trim();
+  document.getElementById('start-btn').disabled = !topic;
+}
+
+// ============================================================
+// CREATE GAME
+// ============================================================
+async function createGame() {
+  const name = document.getElementById('create-name').value.trim();
+  if (!name) { toast('名前を入力してください', 'error'); return; }
+  setLoading(true, '部屋を作っています...');
+  try {
+    const data = await api('POST', '/api/create', {
+      hostName: name,
+      maxPlayers: parseInt(document.getElementById('create-max').value),
+    });
+    state.code = data.code;
+    state.playerId = data.hostId;
+    state.playerName = name;
+    state.isHost = true;
+    enterLobby(data.game);
+  } catch (e) {
+    toast('エラー: ' + e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ============================================================
+// JOIN GAME
+// ============================================================
+async function joinGame() {
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  const name = document.getElementById('join-name').value.trim();
+  if (code.length !== 6) { toast('招待コードは6文字です', 'error'); return; }
+  if (!name) { toast('名前を入力してください', 'error'); return; }
+  setLoading(true, '参加しています...');
+  try {
+    const data = await api('POST', `/api/join/${code}`, { playerName: name });
+    state.code = code;
+    state.playerId = data.playerId;
+    state.playerName = name;
+    state.isHost = false;
+    enterLobby(data.game);
+  } catch (e) {
+    toast('エラー: ' + e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ============================================================
+// LOBBY
+// ============================================================
+function enterLobby(game) {
+  showScreen('screen-lobby');
+  updateHeaderCode(state.code);
+
+  document.getElementById('lobby-code').textContent = state.code;
+  const url = location.origin + location.pathname + '?code=' + state.code;
+  document.getElementById('lobby-url').textContent = url;
+
+  if (state.isHost) {
+    document.getElementById('host-section').style.display = 'block';
+    document.getElementById('guest-waiting').style.display = 'none';
+    // キャンバスを作る
+    hostCanvas = buildCanvas(document.getElementById('host-canvas-area'));
+  } else {
+    document.getElementById('host-section').style.display = 'none';
+    document.getElementById('guest-waiting').style.display = 'block';
+  }
+
+  renderPlayers(game.players);
+  startPolling();
+}
+
+function renderPlayers(players) {
+  const list = document.getElementById('player-list');
+  list.innerHTML = '';
+  players.forEach(p => {
+    const chip = document.createElement('div');
+    chip.className = 'player-chip' +
+      (p.isHost ? ' host' : '') +
+      (p.name === state.playerName ? ' me' : '');
+    chip.innerHTML = `
+      <div class="avatar">${p.name[0]}</div>
+      <span>${p.name}${p.isHost ? ' 👑' : ''}${p.name === state.playerName ? ' (自分)' : ''}</span>
+    `;
+    list.appendChild(chip);
+  });
+  document.getElementById('lobby-player-count').textContent = players.length + '人参加中';
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(state.code).then(() => toast('コードをコピーしました！', 'success'));
+}
+function copyUrl() {
+  const url = location.origin + location.pathname + '?code=' + state.code;
+  navigator.clipboard.writeText(url).then(() => toast('URLをコピーしました！', 'success'));
+}
+
+// ============================================================
+// START GAME (host)
+// ============================================================
+async function startGame() {
+  const topic = document.getElementById('topic-input').value.trim();
+  if (!topic) { toast('お題を入力してください', 'error'); return; }
+  if (!hostCanvas) { toast('キャンバスが見つかりません', 'error'); return; }
+
+  const imageData = hostCanvas.toDataURL('image/png');
+  setLoading(true, 'ゲームを開始しています...');
+  try {
+    await api('POST', `/api/game/${state.code}/start`, {
+      playerId: state.playerId,
+      topic,
+      imageData,
+    });
+    stopPolling();
+    // ホストは自分が描いたので待機画面へ
+    showWaiting('あなたの絵を送りました。次の人を待っています...');
+    startPolling();
+  } catch (e) {
+    toast('エラー: ' + e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ============================================================
+// POLLING
+// ============================================================
+function startPolling() {
+  stopPolling();
+  pollOnce();
+  state.pollTimer = setInterval(pollOnce, 3000);
+}
+
+function stopPolling() {
+  if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+}
+
+async function pollOnce() {
+  try {
+    const data = await api('GET', `/api/game/${state.code}/state?playerId=${state.playerId}`);
+    handleStateUpdate(data);
+  } catch (e) {
+    // silently ignore polling errors
+  }
+}
+
+function handleStateUpdate(game) {
+  const currentScreen = document.querySelector('.screen.active')?.id;
+
+  // ロビー中
+  if (currentScreen === 'screen-lobby') {
+    renderPlayers(game.players);
+    // ゲームが始まった
+    if (game.status !== 'waiting') {
+      stopPolling();
+      if (game.myTurn) {
+        enterDrawing(game);
+      } else {
+        showWaiting('ゲームが始まりました。あなたの番を待っています...');
+        startPolling();
+      }
+    }
+    return;
+  }
+
+  // 待機中
+  if (currentScreen === 'screen-waiting') {
+    updateWaitingProgress(game);
+
+    if (game.status === 'finished') {
+      stopPolling();
+      loadResult();
+      return;
+    }
+
+    if (game.myTurn) {
+      stopPolling();
+      if (game.status === 'guessing') {
+        enterGuess(game);
+      } else {
+        enterDrawing(game);
+      }
+    }
+  }
+}
+
+// ============================================================
+// DRAWING SCREEN (参加者)
+// ============================================================
+function enterDrawing(game) {
+  showScreen('screen-drawing');
+  document.getElementById('drawing-turn-badge').textContent =
+    `${game.myIndex + 1}番目 / ${game.players.length}人中`;
+
+  // 前の人の絵
+  if (game.prevDrawing) {
+    document.getElementById('ref-image-box').style.display = 'block';
+    document.getElementById('ref-image').src = game.prevDrawing.imageData;
+  } else {
+    document.getElementById('ref-image-box').style.display = 'none';
+  }
+
+  // キャンバス
+  drawCanvas = buildCanvas(document.getElementById('drawing-canvas-area'));
+}
+
+async function submitDrawing() {
+  if (!drawCanvas) return;
+  const imageData = drawCanvas.toDataURL('image/png');
+  setLoading(true, '絵を送っています...');
+  try {
+    await api('POST', `/api/game/${state.code}/submit`, {
+      playerId: state.playerId,
+      imageData,
+    });
+    stopPolling();
+    showWaiting('絵を送りました！次の人を待っています...');
+    startPolling();
+  } catch (e) {
+    toast('エラー: ' + e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ============================================================
+// WAITING SCREEN
+// ============================================================
+function showWaiting(msg) {
+  showScreen('screen-waiting');
+  document.getElementById('waiting-msg').textContent = msg;
+}
+
+function updateWaitingProgress(game) {
+  const steps = document.getElementById('progress-steps');
+  steps.innerHTML = '';
+  game.players.forEach((p, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'step-line' + (game.drawingCount > i ? ' done' : '');
+      steps.appendChild(line);
+    }
+    const dot = document.createElement('div');
+    const isDone = i < game.drawingCount;
+    const isCurrent = i === game.currentTurn;
+    dot.className = 'step-dot' + (isDone ? ' done' : isCurrent ? ' current' : '');
+    dot.textContent = isDone ? '✓' : i + 1;
+    dot.title = p.name;
+    steps.appendChild(dot);
+  });
+}
+
+// ============================================================
+// GUESS SCREEN
+// ============================================================
+function enterGuess(game) {
+  showScreen('screen-guess');
+  if (game.prevDrawing) {
+    document.getElementById('guess-image').src = game.prevDrawing.imageData;
+  }
+}
+
+async function submitGuess() {
+  const guess = document.getElementById('guess-input').value.trim();
+  if (!guess) { toast('答えを入力してください', 'error'); return; }
+  setLoading(true, '答えを送っています...');
+  try {
+    await api('POST', `/api/game/${state.code}/submit`, {
+      playerId: state.playerId,
+      guess,
+    });
+    loadResult();
+  } catch (e) {
+    toast('エラー: ' + e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ============================================================
+// RESULT
+// ============================================================
+async function loadResult() {
+  setLoading(true, '結果を取得中...');
+  try {
+    const data = await api('GET', `/api/game/${state.code}/result`);
+    stopPolling();
+    showResult(data);
+  } catch (e) {
+    toast('エラー: ' + e.message, 'error');
+    setLoading(false);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function showResult(data) {
+  showScreen('screen-result');
+
+  // Reveal
+  const reveal = document.getElementById('result-reveal');
+  reveal.innerHTML = `
+    <div class="verdict">${data.correct ? '🎉' : '😅'}</div>
+    <h2 class="${data.correct ? 'correct-badge' : 'wrong-badge'}">
+      ${data.correct ? '正解！！！' : '惜しい！'}
+    </h2>
+    <p style="color:var(--text-muted);margin-bottom:8px;">お題</p>
+    <div class="topic-chip">「${data.topic}」</div>
+    <p style="margin:10px 0 4px;font-size:0.85rem;color:var(--text-muted)">答え</p>
+    <div class="guess-chip">「${data.guess?.text || '(なし)'}」</div>
+  `;
+
+  // Timeline
+  const timeline = document.getElementById('timeline');
+  timeline.innerHTML = `<h3 style="margin-bottom:12px">📜 絵の流れ</h3>`;
+
+  data.drawings.forEach((d, i) => {
+    const item = document.createElement('div');
+    item.className = 'timeline-item';
+    item.innerHTML = `
+      <div class="who">
+        <span>${i + 1}番目</span>
+        <strong>${d.playerName}</strong>が描いた
+      </div>
+      <img src="${d.imageData}" alt="${d.playerName}の絵">
+    `;
+    timeline.appendChild(item);
+  });
+
+  if (data.guess) {
+    const item = document.createElement('div');
+    item.className = 'timeline-item';
+    item.innerHTML = `
+      <div class="who"><strong>${data.guess.playerName}</strong>の答え</div>
+      <p style="font-size:1.4rem;font-weight:700;margin-top:8px">「${data.guess.text}」</p>
+    `;
+    timeline.appendChild(item);
+  }
+}
+
+// ============================================================
+// Util
+// ============================================================
+function updateHeaderCode(code) {
+  document.getElementById('header-code').style.display = 'block';
+  document.getElementById('header-code-text').textContent = code;
+}
+
+function resetGame() {
+  stopPolling();
+  state = { code: null, playerId: null, playerName: null, isHost: false, pollTimer: null };
+  hostCanvas = null;
+  drawCanvas = null;
+  document.getElementById('header-code').style.display = 'none';
+  // 入力欄をリセット
+  document.getElementById('create-name').value = '';
+  document.getElementById('join-code').value = '';
+  document.getElementById('join-name').value = '';
+}
+</script>
 </body>
 </html>
