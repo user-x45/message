@@ -506,8 +506,6 @@
     color: var(--text);
     font-size: 1rem;
   }
-  .correct-badge { color: var(--accent3); }
-  .wrong-badge { color: var(--accent); }
 
   .timeline {
     display: flex;
@@ -631,8 +629,9 @@
         <input type="text" id="create-name" placeholder="例: たろう" maxlength="12">
       </div>
       <div class="field">
-        <label>最大人数</label>
+        <label>人数（全員そろうと開始できます）</label>
         <select id="create-max">
+          <option value="2">2人</option>
           <option value="3">3人</option>
           <option value="4">4人</option>
           <option value="5">5人</option>
@@ -684,7 +683,7 @@
         <label>お題を入力してください</label>
         <input type="text" id="topic-input" placeholder="例: ねこ、富士山、ラーメン..." maxlength="20">
       </div>
-      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">お題を入力して開始すると、30秒でその絵を描きます。参加者には絵だけが10秒間見え、お題は秘密です。</p>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">全員そろってお題を入力すると開始できます。開始後、30秒でその絵を描きます。参加者には絵だけが10秒間見え、お題は秘密です。</p>
       <button class="btn btn-primary btn-full" id="start-btn" onclick="startGame()" disabled>ゲームを開始する →</button>
     </div>
 
@@ -758,6 +757,15 @@
     </div>
   </div>
 
+  <div class="screen" id="screen-aborted">
+    <div class="waiting-box">
+      <div class="waiting-icon">🚪</div>
+      <h2>ゲーム終了</h2>
+      <p id="aborted-msg">誰かが退出したため、ゲームを終了しました。</p>
+      <button class="btn btn-primary" onclick="showScreen('screen-home');resetGame()">🏠 トップに戻る</button>
+    </div>
+  </div>
+
   <div class="screen" id="screen-result">
     <div class="result-reveal" id="result-reveal"></div>
     <div class="timeline" id="timeline"></div>
@@ -786,6 +794,7 @@ let state = {
   playerName: null,
   isHost: false,
   pollTimer: null,
+  ended: false,
 };
 
 let drawCanvas = null;
@@ -1024,9 +1033,17 @@ function buildCanvas(container, width = 680, height = 420) {
   return canvas;
 }
 
+let lobbyPlayerCount = 0;
+let lobbyMaxPlayers = 0;
+
 function checkHostReady() {
   const topic = document.getElementById('topic-input').value.trim();
-  document.getElementById('start-btn').disabled = !topic;
+  const full = lobbyPlayerCount >= lobbyMaxPlayers && lobbyMaxPlayers > 0;
+  const btn = document.getElementById('start-btn');
+  btn.disabled = !(topic && full);
+  btn.textContent = full
+    ? 'ゲームを開始する →'
+    : `あと${Math.max(0, lobbyMaxPlayers - lobbyPlayerCount)}人待っています...`;
 }
 
 async function createGame() {
@@ -1089,11 +1106,13 @@ function enterLobby(game) {
     document.getElementById('guest-waiting').style.display = 'block';
   }
 
-  renderPlayers(game.players);
+  renderPlayers(game.players, game.maxPlayers);
   startPolling();
 }
 
-function renderPlayers(players) {
+function renderPlayers(players, maxPlayers) {
+  lobbyPlayerCount = players.length;
+  if (maxPlayers) lobbyMaxPlayers = maxPlayers;
   const list = document.getElementById('player-list');
   list.innerHTML = '';
   players.forEach(p => {
@@ -1107,7 +1126,8 @@ function renderPlayers(players) {
     `;
     list.appendChild(chip);
   });
-  document.getElementById('lobby-player-count').textContent = players.length + '人参加中';
+  document.getElementById('lobby-player-count').textContent = `${players.length} / ${lobbyMaxPlayers}人`;
+  if (state.isHost) checkHostReady();
 }
 
 function copyCode() {
@@ -1128,7 +1148,6 @@ async function startGame() {
       playerId: state.playerId,
       topic,
     });
-    stopPolling();
     enterDrawing(game.game);
   } catch (e) {
     toast('エラー: ' + e.message, 'error');
@@ -1155,18 +1174,46 @@ async function pollOnce() {
   }
 }
 
+function handleAborted(game) {
+  if (state.ended) return;
+  state.ended = true;
+  stopPolling();
+  stopTimer();
+  setLoading(false);
+  showScreen('screen-aborted');
+  const who = game.abortedBy ? `${game.abortedBy}さんが退出したため、` : '';
+  document.getElementById('aborted-msg').textContent = who + 'ゲームを終了しました。';
+}
+
+function sendLeave() {
+  if (!state.code || !state.playerId || state.ended) return;
+  const url = `${API_BASE}/api/game/${state.code}/leave`;
+  const payload = JSON.stringify({ playerId: state.playerId });
+  try {
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, new Blob([payload], { type: 'text/plain' }));
+    } else {
+      fetch(url, { method: 'POST', body: payload, keepalive: true });
+    }
+  } catch (e) {}
+}
+
+window.addEventListener('pagehide', sendLeave);
+
 function handleStateUpdate(game) {
+  if (game.status === 'aborted') {
+    handleAborted(game);
+    return;
+  }
   const currentScreen = document.querySelector('.screen.active')?.id;
 
   if (currentScreen === 'screen-lobby') {
-    renderPlayers(game.players);
+    renderPlayers(game.players, game.maxPlayers);
     if (game.status !== 'waiting') {
-      stopPolling();
       if (game.myTurn) {
         enterDrawing(game);
       } else {
         showWaiting('ゲームが始まりました。あなたの番を待っています...');
-        startPolling();
       }
     }
     return;
@@ -1182,7 +1229,6 @@ function handleStateUpdate(game) {
     }
 
     if (game.myTurn) {
-      stopPolling();
       if (game.status === 'guessing') {
         enterGuess(game);
       } else {
@@ -1263,9 +1309,7 @@ async function submitDrawing(auto = false) {
       playerId: state.playerId,
       imageData,
     });
-    stopPolling();
     showWaiting('絵を送りました！次の人を待っています...');
-    startPolling();
   } catch (e) {
     drawSubmitted = false;
     toast('エラー: ' + e.message, 'error');
@@ -1348,6 +1392,7 @@ async function submitGuess() {
       playerId: state.playerId,
       guess,
     });
+    stopPolling();
     loadResult();
   } catch (e) {
     toast('エラー: ' + e.message, 'error');
@@ -1362,6 +1407,7 @@ async function loadResult() {
     const data = await api('GET', `/api/game/${state.code}/result`);
     stopPolling();
     stopTimer();
+    state.ended = true;
     showResult(data);
   } catch (e) {
     toast('エラー: ' + e.message, 'error');
@@ -1376,10 +1422,8 @@ function showResult(data) {
 
   const reveal = document.getElementById('result-reveal');
   reveal.innerHTML = `
-    <div class="verdict">${data.correct ? '🎉' : '😅'}</div>
-    <h2 class="${data.correct ? 'correct-badge' : 'wrong-badge'}">
-      ${data.correct ? '正解！！！' : '惜しい！'}
-    </h2>
+    <div class="verdict">🎨</div>
+    <h2>結果発表</h2>
     <p style="color:var(--text-muted);margin-bottom:8px;">お題</p>
     <div class="topic-chip">「${data.topic}」</div>
     <p style="margin:10px 0 4px;font-size:0.85rem;color:var(--text-muted)">答え</p>
@@ -1419,9 +1463,12 @@ function updateHeaderCode(code) {
 }
 
 function resetGame() {
+  sendLeave();
   stopPolling();
   stopTimer();
-  state = { code: null, playerId: null, playerName: null, isHost: false, pollTimer: null };
+  state = { code: null, playerId: null, playerName: null, isHost: false, pollTimer: null, ended: false };
+  lobbyPlayerCount = 0;
+  lobbyMaxPlayers = 0;
   drawCanvas = null;
   document.getElementById('header-code').style.display = 'none';
   document.getElementById('create-name').value = '';
