@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>お絵描き伝言ゲーム</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
 
@@ -80,6 +81,7 @@
     margin-bottom: 12px;
   }
   .hero h1 em { color: var(--accent); font-style: normal; }
+  .hero h1 i { color: var(--accent2); }
   .hero p {
     color: var(--text-muted);
     font-size: 1.05rem;
@@ -105,7 +107,7 @@
     text-align: center;
   }
   .action-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .action-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .action-card .icon { font-size: 2.5rem; margin-bottom: 12px; color: var(--accent); }
   .action-card h2 { font-size: 1.1rem; margin-bottom: 6px; }
   .action-card p { font-size: 0.85rem; color: var(--text-muted); }
 
@@ -347,6 +349,37 @@
   }
   .view-overlay p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
 
+  .canvas-stage {
+    position: relative;
+    line-height: 0;
+  }
+  .brush-cursor {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 1px solid #000;
+    box-shadow: 0 0 0 1px #fff, inset 0 0 0 1px #fff;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 5;
+    box-sizing: border-box;
+  }
+  .brush-cursor.eraser { background: rgba(255,255,255,0.35); }
+  .brush-cursor::before,
+  .brush-cursor::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background: #000;
+    box-shadow: 0 0 0 1px #fff;
+    transform: translate(-50%, -50%);
+  }
+  .brush-cursor::before { width: 5px; height: 1px; }
+  .brush-cursor::after { width: 1px; height: 5px; }
+
   .canvas-wrap {
     position: relative;
     background: var(--surface);
@@ -394,6 +427,10 @@
   .swatch:hover { transform: scale(1.15); }
   .swatch.active { border-color: #fff; transform: scale(1.15); }
 
+  input[type=number] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
   input[type=range] {
     -webkit-appearance: none;
     height: 4px;
@@ -431,7 +468,7 @@
   canvas {
     display: block;
     border-radius: 6px;
-    cursor: crosshair;
+    cursor: none;
     touch-action: none;
     width: 100%;
     background: #ffffff;
@@ -444,7 +481,9 @@
     padding: 40px 32px;
     text-align: center;
   }
-  .waiting-icon { font-size: 3rem; margin-bottom: 16px; }
+  .waiting-icon { font-size: 3rem; margin-bottom: 16px; color: var(--accent2); }
+  .host-crown { color: var(--accent2); }
+  .btn i, .back-btn i, .tool-btn i { font-size: 0.9em; }
   .waiting-box h2 { font-size: 1.2rem; margin-bottom: 8px; }
   .waiting-box p { color: var(--text-muted); margin-bottom: 24px; }
   .progress-steps {
@@ -485,6 +524,7 @@
   .result-reveal .verdict {
     font-size: 3rem;
     margin-bottom: 8px;
+    color: var(--accent2);
   }
   .result-reveal h2 { font-size: 1.5rem; margin-bottom: 6px; }
   .result-reveal .topic-chip {
@@ -603,17 +643,17 @@
 
   <div class="screen active" id="screen-home">
     <div class="hero">
-      <h1>🎨 お絵描き<br><em>伝言ゲーム</em></h1>
+      <h1><i class="fa-solid fa-palette"></i> お絵描き<br><em>伝言ゲーム</em></h1>
       <p>絵で伝える、絵で当てる。みんなでワイワイ楽しもう！</p>
     </div>
     <div class="home-actions">
       <div class="action-card" onclick="showScreen('screen-create')">
-        <div class="icon">🏠</div>
+        <div class="icon"><i class="fa-solid fa-house"></i></div>
         <h2>ゲームを作る</h2>
         <p>ホストとしてお題を決めてゲームを始める</p>
       </div>
       <div class="action-card" onclick="showScreen('screen-join')">
-        <div class="icon">🚪</div>
+        <div class="icon"><i class="fa-solid fa-door-open"></i></div>
         <h2>参加する</h2>
         <p>招待コードまたはURLで友達のゲームに参加する</p>
       </div>
@@ -621,33 +661,25 @@
   </div>
 
   <div class="screen" id="screen-create">
-    <button class="back-btn" onclick="showScreen('screen-home')">← 戻る</button>
+    <button class="back-btn" onclick="showScreen('screen-home')"><i class="fa-solid fa-arrow-left"></i> 戻る</button>
     <div class="form-card">
-      <h2>🏠 ゲームを作る</h2>
+      <h2><i class="fa-solid fa-house"></i> ゲームを作る</h2>
       <div class="field">
         <label>あなたの名前</label>
         <input type="text" id="create-name" placeholder="例: たろう" maxlength="12">
       </div>
       <div class="field">
-        <label>人数（全員そろうと開始できます）</label>
-        <select id="create-max">
-          <option value="2">2人</option>
-          <option value="3">3人</option>
-          <option value="4">4人</option>
-          <option value="5">5人</option>
-          <option value="6">6人</option>
-          <option value="8" selected>8人</option>
-          <option value="10">10人</option>
-        </select>
+        <label>人数 (2〜16人・全員そろうと開始できます)</label>
+        <input type="number" id="create-max" value="4" min="2" max="16" step="1" inputmode="numeric" placeholder="2〜16">
       </div>
-      <button class="btn btn-primary btn-full" onclick="createGame()">部屋を作る →</button>
+      <button class="btn btn-primary btn-full" onclick="createGame()">部屋を作る <i class="fa-solid fa-arrow-right"></i></button>
     </div>
   </div>
 
   <div class="screen" id="screen-join">
-    <button class="back-btn" onclick="showScreen('screen-home')">← 戻る</button>
+    <button class="back-btn" onclick="showScreen('screen-home')"><i class="fa-solid fa-arrow-left"></i> 戻る</button>
     <div class="form-card">
-      <h2>🚪 ゲームに参加する</h2>
+      <h2><i class="fa-solid fa-door-open"></i> ゲームに参加する</h2>
       <div class="field">
         <label>招待コード (6文字)</label>
         <input type="text" id="join-code" placeholder="例: ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:1.3rem">
@@ -656,7 +688,7 @@
         <label>あなたの名前</label>
         <input type="text" id="join-name" placeholder="例: はなこ" maxlength="12">
       </div>
-      <button class="btn btn-primary btn-full" onclick="joinGame()">参加する →</button>
+      <button class="btn btn-primary btn-full" onclick="joinGame()">参加する <i class="fa-solid fa-arrow-right"></i></button>
     </div>
   </div>
 
@@ -684,12 +716,12 @@
         <input type="text" id="topic-input" placeholder="例: ねこ、富士山、ラーメン..." maxlength="20">
       </div>
       <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">全員そろってお題を入力すると開始できます。開始後、30秒でその絵を描きます。参加者には絵だけが10秒間見え、お題は秘密です。</p>
-      <button class="btn btn-primary btn-full" id="start-btn" onclick="startGame()" disabled>ゲームを開始する →</button>
+      <button class="btn btn-primary btn-full" id="start-btn" onclick="startGame()" disabled>ゲームを開始する <i class="fa-solid fa-arrow-right"></i></button>
     </div>
 
     <div id="guest-waiting" style="display:none">
       <div class="waiting-box">
-        <div class="waiting-icon">⏳</div>
+        <div class="waiting-icon"><i class="fa-solid fa-hourglass-half"></i></div>
         <h2>ホストの準備を待っています</h2>
         <p>ホストがお題を決めてゲームを始めるまでお待ちください。</p>
       </div>
@@ -698,7 +730,7 @@
 
   <div class="screen" id="screen-drawing">
     <div class="drawing-header">
-      <h2 id="drawing-title">✏️ 絵を描こう</h2>
+      <h2 id="drawing-title"><i class="fa-solid fa-pencil"></i> 絵を描こう</h2>
       <span class="turn-badge" id="drawing-turn-badge">あなたの番です</span>
     </div>
 
@@ -721,14 +753,14 @@
     <div id="draw-area" style="display:none">
       <div id="drawing-canvas-area"></div>
       <button class="btn btn-success btn-full" id="submit-drawing-btn" onclick="submitDrawing()" style="margin-top:12px">
-        絵を送る →
+        絵を送る <i class="fa-solid fa-arrow-right"></i>
       </button>
     </div>
   </div>
 
   <div class="screen" id="screen-waiting">
     <div class="waiting-box">
-      <div class="waiting-icon">🎨</div>
+      <div class="waiting-icon"><i class="fa-solid fa-palette"></i></div>
       <h2>提出しました！次の人を待っています</h2>
       <p id="waiting-msg">他の参加者が絵を描いています...</p>
       <div class="progress-steps" id="progress-steps"></div>
@@ -738,7 +770,7 @@
 
   <div class="screen" id="screen-guess">
     <div class="guess-section">
-      <h2>🔍 お題を当てよう！</h2>
+      <h2><i class="fa-solid fa-magnifying-glass"></i> お題を当てよう！</h2>
       <p>最後の絵を見て、最初のお題が何だったか当ててください。絵は10秒間だけ見られます。</p>
       <div class="timer-bar" id="guess-timer-bar">
         <span class="timer-label">残り</span>
@@ -753,16 +785,16 @@
         <label>あなたの答え</label>
         <input type="text" id="guess-input" placeholder="お題を入力..." maxlength="20">
       </div>
-      <button class="btn btn-success btn-full" id="guess-btn" onclick="submitGuess()" style="display:none">答えを送る →</button>
+      <button class="btn btn-success btn-full" id="guess-btn" onclick="submitGuess()" style="display:none">答えを送る <i class="fa-solid fa-arrow-right"></i></button>
     </div>
   </div>
 
   <div class="screen" id="screen-aborted">
     <div class="waiting-box">
-      <div class="waiting-icon">🚪</div>
+      <div class="waiting-icon"><i class="fa-solid fa-door-open"></i></div>
       <h2>ゲーム終了</h2>
       <p id="aborted-msg">誰かが退出したため、ゲームを終了しました。</p>
-      <button class="btn btn-primary" onclick="showScreen('screen-home');resetGame()">🏠 トップに戻る</button>
+      <button class="btn btn-primary" onclick="showScreen('screen-home');resetGame()"><i class="fa-solid fa-house"></i> トップに戻る</button>
     </div>
   </div>
 
@@ -770,7 +802,7 @@
     <div class="result-reveal" id="result-reveal"></div>
     <div class="timeline" id="timeline"></div>
     <div style="text-align:center">
-      <button class="btn btn-primary" onclick="showScreen('screen-home');resetGame()">🏠 トップに戻る</button>
+      <button class="btn btn-primary" onclick="showScreen('screen-home');resetGame()"><i class="fa-solid fa-house"></i> トップに戻る</button>
     </div>
   </div>
 
@@ -928,7 +960,7 @@ function buildCanvas(container, width = 680, height = 420) {
 
   const penBtn = document.createElement('button');
   penBtn.className = 'tool-btn active';
-  penBtn.innerHTML = '✏️ ペン';
+  penBtn.innerHTML = '<i class="fa-solid fa-pencil"></i> ペン';
   penBtn.onclick = () => {
     currentTool = 'pen';
     penBtn.classList.add('active');
@@ -940,7 +972,7 @@ function buildCanvas(container, width = 680, height = 420) {
 
   const eraserBtn = document.createElement('button');
   eraserBtn.className = 'tool-btn';
-  eraserBtn.innerHTML = '🧹 消しゴム';
+  eraserBtn.innerHTML = '<i class="fa-solid fa-eraser"></i> 消しゴム';
   eraserBtn.onclick = () => {
     currentTool = 'eraser';
     eraserBtn.classList.add('active');
@@ -950,7 +982,7 @@ function buildCanvas(container, width = 680, height = 420) {
 
   const clearBtn = document.createElement('button');
   clearBtn.className = 'tool-btn';
-  clearBtn.innerHTML = '🗑️ 全消し';
+  clearBtn.innerHTML = '<i class="fa-solid fa-trash"></i> 全消し';
   clearBtn.onclick = () => {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -962,10 +994,43 @@ function buildCanvas(container, width = 680, height = 420) {
   toolbar.appendChild(toolGroup);
   container.appendChild(toolbar);
 
+  const stage = document.createElement('div');
+  stage.className = 'canvas-stage';
+  container.appendChild(stage);
+
   const canvas = document.createElement('canvas');
   canvas.width = 680;
   canvas.height = 420;
-  container.appendChild(canvas);
+  stage.appendChild(canvas);
+
+  const brushCursor = document.createElement('div');
+  brushCursor.className = 'brush-cursor';
+  stage.appendChild(brushCursor);
+
+  function updateCursor(e) {
+    if (e.pointerType && e.pointerType === 'touch') return;
+    const rect = canvas.getBoundingClientRect();
+    const scale = rect.width / canvas.width;
+    const diameter = Math.max(8, parseInt(sizeSlider.value) * scale);
+    brushCursor.style.width = diameter + 'px';
+    brushCursor.style.height = diameter + 'px';
+    brushCursor.style.left = (e.clientX - rect.left) + 'px';
+    brushCursor.style.top = (e.clientY - rect.top) + 'px';
+    brushCursor.classList.toggle('eraser', currentTool === 'eraser');
+    brushCursor.style.display = 'block';
+  }
+
+  function hideCursor() {
+    brushCursor.style.display = 'none';
+  }
+
+  canvas.addEventListener('mouseenter', updateCursor);
+  canvas.addEventListener('mousemove', updateCursor);
+  canvas.addEventListener('mouseleave', hideCursor);
+  canvas.addEventListener('touchstart', hideCursor, { passive: true });
+  sizeSlider.addEventListener('input', () => {
+    brushCursor.style.display = 'none';
+  });
 
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#ffffff';
@@ -1003,8 +1068,8 @@ function buildCanvas(container, width = 680, height = 420) {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     if (currentTool === 'eraser') {
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.strokeStyle = 'rgba(0,0,0,1)';
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = '#ffffff';
     } else {
       ctx.globalCompositeOperation = 'source-over';
       ctx.strokeStyle = currentColor;
@@ -1041,19 +1106,25 @@ function checkHostReady() {
   const full = lobbyPlayerCount >= lobbyMaxPlayers && lobbyMaxPlayers > 0;
   const btn = document.getElementById('start-btn');
   btn.disabled = !(topic && full);
-  btn.textContent = full
-    ? 'ゲームを開始する →'
+  btn.innerHTML = full
+    ? 'ゲームを開始する <i class="fa-solid fa-arrow-right"></i>'
     : `あと${Math.max(0, lobbyMaxPlayers - lobbyPlayerCount)}人待っています...`;
 }
 
 async function createGame() {
   const name = document.getElementById('create-name').value.trim();
   if (!name) { toast('名前を入力してください', 'error'); return; }
+  const maxRaw = document.getElementById('create-max').value.trim();
+  const maxPlayers = Number(maxRaw);
+  if (!maxRaw || !Number.isInteger(maxPlayers) || maxPlayers < 2 || maxPlayers > 16) {
+    toast('人数は2〜16人の整数で入力してください', 'error');
+    return;
+  }
   setLoading(true, '部屋を作っています...');
   try {
     const data = await api('POST', '/api/create', {
       hostName: name,
-      maxPlayers: parseInt(document.getElementById('create-max').value),
+      maxPlayers,
     });
     state.code = data.code;
     state.playerId = data.hostId;
@@ -1122,7 +1193,7 @@ function renderPlayers(players, maxPlayers) {
       (p.name === state.playerName ? ' me' : '');
     chip.innerHTML = `
       <div class="avatar">${p.name[0]}</div>
-      <span>${p.name}${p.isHost ? ' 👑' : ''}${p.name === state.playerName ? ' (自分)' : ''}</span>
+      <span>${p.name}${p.isHost ? ' <i class="fa-solid fa-crown host-crown"></i>' : ''}${p.name === state.playerName ? ' (自分)' : ''}</span>
     `;
     list.appendChild(chip);
   });
@@ -1265,7 +1336,7 @@ function enterDrawing(game) {
     overlay.style.display = 'none';
     document.getElementById('ref-image').src = '';
     drawArea.style.display = 'block';
-    title.textContent = '✏️ 絵を描こう';
+    title.innerHTML = '<i class="fa-solid fa-pencil"></i> 絵を描こう';
     drawCanvas = buildCanvas(document.getElementById('drawing-canvas-area'));
     runTimer({
       seconds: DRAW_SECONDS,
@@ -1284,7 +1355,7 @@ function enterDrawing(game) {
     }
     drawArea.style.display = 'none';
     overlay.style.display = 'block';
-    title.textContent = '👀 絵を覚えよう';
+    title.innerHTML = '<i class="fa-solid fa-eye"></i> 絵を覚えよう';
     document.getElementById('ref-image').src = game.prevDrawing.imageData;
     runTimer({
       seconds: VIEW_SECONDS,
@@ -1336,7 +1407,7 @@ function updateWaitingProgress(game) {
     const isDone = i < game.drawingCount;
     const isCurrent = i === game.currentTurn;
     dot.className = 'step-dot' + (isDone ? ' done' : isCurrent ? ' current' : '');
-    dot.textContent = isDone ? '✓' : i + 1;
+    dot.innerHTML = isDone ? '<i class="fa-solid fa-check"></i>' : i + 1;
     dot.title = p.name;
     steps.appendChild(dot);
   });
@@ -1422,7 +1493,7 @@ function showResult(data) {
 
   const reveal = document.getElementById('result-reveal');
   reveal.innerHTML = `
-    <div class="verdict">🎨</div>
+    <div class="verdict"><i class="fa-solid fa-palette"></i></div>
     <h2>結果発表</h2>
     <p style="color:var(--text-muted);margin-bottom:8px;">お題</p>
     <div class="topic-chip">「${data.topic}」</div>
@@ -1431,7 +1502,7 @@ function showResult(data) {
   `;
 
   const timeline = document.getElementById('timeline');
-  timeline.innerHTML = `<h3 style="margin-bottom:12px">📜 絵の流れ</h3>`;
+  timeline.innerHTML = `<h3 style="margin-bottom:12px"><i class="fa-solid fa-scroll"></i> 絵の流れ</h3>`;
 
   data.drawings.forEach((d, i) => {
     const item = document.createElement('div');
@@ -1472,6 +1543,7 @@ function resetGame() {
   drawCanvas = null;
   document.getElementById('header-code').style.display = 'none';
   document.getElementById('create-name').value = '';
+  document.getElementById('create-max').value = '4';
   document.getElementById('join-code').value = '';
   document.getElementById('join-name').value = '';
 }
