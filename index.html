@@ -484,6 +484,8 @@
   .waiting-icon { font-size: 3rem; margin-bottom: 16px; color: var(--accent2); }
   .host-crown { color: var(--accent2); }
   .btn i, .back-btn i, .tool-btn i { font-size: 0.9em; }
+  .tool-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .tool-btn:disabled:hover { background: var(--surface2); }
   .waiting-box h2 { font-size: 1.2rem; margin-bottom: 8px; }
   .waiting-box p { color: var(--text-muted); margin-bottom: 24px; }
   .progress-steps {
@@ -984,6 +986,7 @@ function buildCanvas(container, width = 680, height = 420) {
   clearBtn.className = 'tool-btn';
   clearBtn.innerHTML = '<i class="fa-solid fa-trash"></i> 全消し';
   clearBtn.onclick = () => {
+    pushHistory();
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
@@ -992,6 +995,27 @@ function buildCanvas(container, width = 680, height = 420) {
   toolGroup.appendChild(eraserBtn);
   toolGroup.appendChild(clearBtn);
   toolbar.appendChild(toolGroup);
+
+  const historyGroup = document.createElement('div');
+  historyGroup.className = 'tool-group';
+
+  const undoBtn = document.createElement('button');
+  undoBtn.className = 'tool-btn';
+  undoBtn.type = 'button';
+  undoBtn.title = '元に戻す (Ctrl+Z)';
+  undoBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 元に戻す';
+  undoBtn.disabled = true;
+
+  const redoBtn = document.createElement('button');
+  redoBtn.className = 'tool-btn';
+  redoBtn.type = 'button';
+  redoBtn.title = 'やり直す (Ctrl+Shift+Z)';
+  redoBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> やり直す';
+  redoBtn.disabled = true;
+
+  historyGroup.appendChild(undoBtn);
+  historyGroup.appendChild(redoBtn);
+  toolbar.appendChild(historyGroup);
   container.appendChild(toolbar);
 
   const stage = document.createElement('div');
@@ -1036,6 +1060,63 @@ function buildCanvas(container, width = 680, height = 420) {
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  const HISTORY_LIMIT = 30;
+  let undoStack = [];
+  let redoStack = [];
+
+  function snapshot() {
+    return ctx.getImageData(0, 0, canvas.width, canvas.height);
+  }
+
+  function refreshHistoryButtons() {
+    undoBtn.disabled = undoStack.length === 0;
+    redoBtn.disabled = redoStack.length === 0;
+  }
+
+  function pushHistory() {
+    undoStack.push(snapshot());
+    if (undoStack.length > HISTORY_LIMIT) undoStack.shift();
+    redoStack = [];
+    refreshHistoryButtons();
+  }
+
+  function undo() {
+    if (drawing || undoStack.length === 0) return;
+    redoStack.push(snapshot());
+    ctx.putImageData(undoStack.pop(), 0, 0);
+    refreshHistoryButtons();
+  }
+
+  function redo() {
+    if (drawing || redoStack.length === 0) return;
+    undoStack.push(snapshot());
+    ctx.putImageData(redoStack.pop(), 0, 0);
+    refreshHistoryButtons();
+  }
+
+  undoBtn.onclick = undo;
+  redoBtn.onclick = redo;
+
+  function onHistoryKey(e) {
+    if (!canvas.isConnected) {
+      document.removeEventListener('keydown', onHistoryKey);
+      return;
+    }
+    if (!(e.ctrlKey || e.metaKey)) return;
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    const key = e.key.toLowerCase();
+    if (key === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      undo();
+    } else if ((key === 'z' && e.shiftKey) || key === 'y') {
+      e.preventDefault();
+      redo();
+    }
+  }
+
+  document.addEventListener('keydown', onHistoryKey);
+
   let drawing = false;
   let lastX = 0, lastY = 0;
 
@@ -1054,6 +1135,7 @@ function buildCanvas(container, width = 680, height = 420) {
 
   function startDraw(e) {
     e.preventDefault();
+    pushHistory();
     drawing = true;
     [lastX, lastY] = getPos(e);
     ctx.beginPath();
