@@ -33,7 +33,6 @@
     align-items: center;
   }
 
-  /* ===== Header ===== */
   header {
     width: 100%;
     padding: 16px 24px;
@@ -60,7 +59,6 @@
   }
   .code-badge strong { color: var(--accent2); letter-spacing: 2px; font-size: 1rem; }
 
-  /* ===== Main ===== */
   main {
     width: 100%;
     max-width: 860px;
@@ -68,11 +66,9 @@
     flex: 1;
   }
 
-  /* ===== Screens ===== */
   .screen { display: none; }
   .screen.active { display: block; }
 
-  /* ===== Home screen ===== */
   .hero {
     text-align: center;
     padding: 48px 0 40px;
@@ -113,7 +109,6 @@
   .action-card h2 { font-size: 1.1rem; margin-bottom: 6px; }
   .action-card p { font-size: 0.85rem; color: var(--text-muted); }
 
-  /* ===== Form card ===== */
   .form-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -150,7 +145,6 @@
   }
   .field select option { background: var(--surface); }
 
-  /* ===== Buttons ===== */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -189,7 +183,6 @@
   }
   .back-btn:hover { color: var(--text); }
 
-  /* ===== Lobby ===== */
   .lobby-header {
     display: flex;
     align-items: center;
@@ -256,7 +249,6 @@
   .player-chip.host { border-color: var(--accent2); }
   .player-chip.me { border-color: var(--accent3); }
 
-  /* ===== Drawing screen ===== */
   .drawing-header {
     display: flex;
     align-items: center;
@@ -304,7 +296,57 @@
   .ref-image-box p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
   .ref-image-box img { max-width: 100%; border-radius: 6px; display: block; }
 
-  /* ===== Canvas toolbar ===== */
+  .timer-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .timer-label { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
+  .timer-count {
+    font-size: 1.6rem;
+    font-weight: 900;
+    min-width: 2.4ch;
+    text-align: right;
+    color: var(--accent2);
+  }
+  .timer-count.danger { color: var(--accent); }
+  .timer-track {
+    flex: 1;
+    height: 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .timer-fill {
+    height: 100%;
+    width: 100%;
+    background: var(--accent3);
+    transition: width 0.25s linear, background 0.25s;
+  }
+  .timer-fill.danger { background: var(--accent); }
+
+  .view-overlay {
+    background: var(--surface);
+    border: 2px solid var(--accent3);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .view-overlay img {
+    max-width: 100%;
+    border-radius: 6px;
+    display: block;
+    margin: 0 auto;
+    background: #fff;
+  }
+  .view-overlay p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
+
   .canvas-wrap {
     position: relative;
     background: var(--surface);
@@ -336,7 +378,6 @@
     white-space: nowrap;
   }
 
-  /* Color swatches */
   .color-swatches {
     display: flex;
     gap: 5px;
@@ -353,7 +394,6 @@
   .swatch:hover { transform: scale(1.15); }
   .swatch.active { border-color: #fff; transform: scale(1.15); }
 
-  /* Size slider */
   input[type=range] {
     -webkit-appearance: none;
     height: 4px;
@@ -397,7 +437,6 @@
     background: #ffffff;
   }
 
-  /* ===== Waiting screen ===== */
   .waiting-box {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -435,12 +474,10 @@
   }
   .step-line.done { background: var(--accent3); }
 
-  /* ===== Guess screen ===== */
   .guess-section { max-width: 560px; margin: 0 auto; }
   .guess-section h2 { font-size: 1.2rem; margin-bottom: 8px; }
   .guess-section p { color: var(--text-muted); margin-bottom: 20px; }
 
-  /* ===== Result screen ===== */
   .result-reveal {
     text-align: center;
     margin-bottom: 32px;
@@ -500,7 +537,6 @@
     background: #fff;
   }
 
-  /* ===== Toasts ===== */
   #toast-container {
     position: fixed;
     bottom: 24px;
@@ -526,7 +562,6 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* ===== Spinner ===== */
   .spinner {
     width: 20px; height: 20px;
     border: 2px solid var(--border);
@@ -568,7 +603,6 @@
 
 <main>
 
-  <!-- ===== Home ===== -->
   <div class="screen active" id="screen-home">
     <div class="hero">
       <h1>🎨 お絵描き<br><em>伝言ゲーム</em></h1>
@@ -588,7 +622,6 @@
     </div>
   </div>
 
-  <!-- ===== Create ===== -->
   <div class="screen" id="screen-create">
     <button class="back-btn" onclick="showScreen('screen-home')">← 戻る</button>
     <div class="form-card">
@@ -612,7 +645,6 @@
     </div>
   </div>
 
-  <!-- ===== Join ===== -->
   <div class="screen" id="screen-join">
     <button class="back-btn" onclick="showScreen('screen-home')">← 戻る</button>
     <div class="form-card">
@@ -629,7 +661,6 @@
     </div>
   </div>
 
-  <!-- ===== Lobby ===== -->
   <div class="screen" id="screen-lobby">
     <div class="lobby-header">
       <h2 id="lobby-title">ロビー</h2>
@@ -648,15 +679,13 @@
 
     <div class="player-list" id="player-list"></div>
 
-    <!-- ホスト用: お題入力と最初の絵を描く -->
     <div id="host-section" style="display:none">
       <div class="field">
         <label>お題を入力してください</label>
         <input type="text" id="topic-input" placeholder="例: ねこ、富士山、ラーメン..." maxlength="20">
       </div>
-      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">お題を入力したら、その絵を描いてください。参加者には絵だけが見え、お題は秘密です。</p>
-      <div id="host-canvas-area"></div>
-      <button class="btn btn-primary btn-full" id="start-btn" onclick="startGame()" disabled>ゲームを開始して絵を送る →</button>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">お題を入力して開始すると、30秒でその絵を描きます。参加者には絵だけが10秒間見え、お題は秘密です。</p>
+      <button class="btn btn-primary btn-full" id="start-btn" onclick="startGame()" disabled>ゲームを開始する →</button>
     </div>
 
     <div id="guest-waiting" style="display:none">
@@ -668,25 +697,36 @@
     </div>
   </div>
 
-  <!-- ===== Drawing (参加者が絵を描く) ===== -->
   <div class="screen" id="screen-drawing">
     <div class="drawing-header">
-      <h2>✏️ 絵を描こう</h2>
+      <h2 id="drawing-title">✏️ 絵を描こう</h2>
       <span class="turn-badge" id="drawing-turn-badge">あなたの番です</span>
     </div>
 
-    <div class="ref-image-box" id="ref-image-box" style="display:none">
-      <p>前の人が描いた絵を参考に、同じものを描いてください</p>
+    <div class="topic-display" id="topic-display" style="display:none">
+      <span class="label">お題</span>
+      <span class="value" id="topic-display-value"></span>
+    </div>
+
+    <div class="timer-bar">
+      <span class="timer-label" id="timer-label">残り</span>
+      <span class="timer-count" id="timer-count">30</span>
+      <div class="timer-track"><div class="timer-fill" id="timer-fill"></div></div>
+    </div>
+
+    <div class="view-overlay" id="view-overlay" style="display:none">
+      <p>前の人の絵です。10秒間だけ見られます。よく覚えてください！</p>
       <img id="ref-image" src="" alt="前の人の絵">
     </div>
 
-    <div id="drawing-canvas-area"></div>
-    <button class="btn btn-success btn-full" id="submit-drawing-btn" onclick="submitDrawing()" style="margin-top:12px">
-      絵を送る →
-    </button>
+    <div id="draw-area" style="display:none">
+      <div id="drawing-canvas-area"></div>
+      <button class="btn btn-success btn-full" id="submit-drawing-btn" onclick="submitDrawing()" style="margin-top:12px">
+        絵を送る →
+      </button>
+    </div>
   </div>
 
-  <!-- ===== Waiting for others ===== -->
   <div class="screen" id="screen-waiting">
     <div class="waiting-box">
       <div class="waiting-icon">🎨</div>
@@ -697,24 +737,27 @@
     </div>
   </div>
 
-  <!-- ===== Guess ===== -->
   <div class="screen" id="screen-guess">
     <div class="guess-section">
       <h2>🔍 お題を当てよう！</h2>
-      <p>最後の絵を見て、最初のお題が何だったか当ててください。</p>
-      <div class="ref-image-box">
+      <p>最後の絵を見て、最初のお題が何だったか当ててください。絵は10秒間だけ見られます。</p>
+      <div class="timer-bar" id="guess-timer-bar">
+        <span class="timer-label">残り</span>
+        <span class="timer-count" id="guess-timer-count">10</span>
+        <div class="timer-track"><div class="timer-fill" id="guess-timer-fill"></div></div>
+      </div>
+      <div class="ref-image-box" id="guess-image-box">
         <p>最後に届いた絵</p>
         <img id="guess-image" src="" alt="最後の絵">
       </div>
-      <div class="field">
+      <div class="field" id="guess-field" style="display:none">
         <label>あなたの答え</label>
         <input type="text" id="guess-input" placeholder="お題を入力..." maxlength="20">
       </div>
-      <button class="btn btn-success btn-full" onclick="submitGuess()">答えを送る →</button>
+      <button class="btn btn-success btn-full" id="guess-btn" onclick="submitGuess()" style="display:none">答えを送る →</button>
     </div>
   </div>
 
-  <!-- ===== Result ===== -->
   <div class="screen" id="screen-result">
     <div class="result-reveal" id="result-reveal"></div>
     <div class="timeline" id="timeline"></div>
@@ -725,7 +768,6 @@
 
 </main>
 
-<!-- Loading overlay -->
 <div class="loading-overlay" id="loading-overlay">
   <div class="loading-card">
     <div class="spinner"></div>
@@ -733,18 +775,11 @@
   </div>
 </div>
 
-<!-- Toast container -->
 <div id="toast-container"></div>
 
 <script>
-// ============================================================
-// CONFIG — デプロイ後にWorkerのURLを書き換えてください
-// ============================================================
 const API_BASE = 'https://message-server.user-x45.workers.dev';
 
-// ============================================================
-// State
-// ============================================================
 let state = {
   code: null,
   playerId: null,
@@ -753,12 +788,44 @@ let state = {
   pollTimer: null,
 };
 
-let hostCanvas = null;   // ロビー用キャンバス (ホスト)
-let drawCanvas = null;   // 参加者用キャンバス
+let drawCanvas = null;
 
-// ============================================================
-// Routing — URL から招待コードを読む
-// ============================================================
+const VIEW_SECONDS = 10;
+const DRAW_SECONDS = 30;
+
+let timerHandle = null;
+let drawSubmitted = false;
+
+function stopTimer() {
+  if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+}
+
+function runTimer({ seconds, elapsedMs = 0, countEl, fillEl, labelEl, label, onTick, onDone }) {
+  stopTimer();
+  const totalMs = seconds * 1000;
+  const startedLocal = Date.now() - Math.min(elapsedMs, totalMs);
+  if (labelEl && label) labelEl.textContent = label;
+
+  const tick = () => {
+    const remainMs = Math.max(0, totalMs - (Date.now() - startedLocal));
+    const remainSec = Math.ceil(remainMs / 1000);
+    countEl.textContent = remainSec;
+    const danger = remainSec <= 5;
+    countEl.classList.toggle('danger', danger);
+    fillEl.classList.toggle('danger', danger);
+    fillEl.style.width = (remainMs / totalMs * 100) + '%';
+    if (onTick) onTick(remainSec);
+    if (remainMs <= 0) {
+      stopTimer();
+      if (onDone) onDone();
+    }
+  };
+  tick();
+  if (timerHandle === null && (Date.now() - startedLocal) < totalMs) {
+    timerHandle = setInterval(tick, 250);
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(location.search);
   const code = params.get('code');
@@ -768,17 +835,11 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// ============================================================
-// Screen management
-// ============================================================
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// ============================================================
-// API helpers
-// ============================================================
 async function api(method, path, body) {
   const opts = {
     method,
@@ -791,9 +852,6 @@ async function api(method, path, body) {
   return data;
 }
 
-// ============================================================
-// Toast
-// ============================================================
 function toast(msg, type = '') {
   const el = document.createElement('div');
   el.className = 'toast ' + type;
@@ -802,25 +860,17 @@ function toast(msg, type = '') {
   setTimeout(() => el.remove(), 3200);
 }
 
-// ============================================================
-// Loading
-// ============================================================
 function setLoading(show, text = '処理中...') {
   document.getElementById('loading-overlay').classList.toggle('show', show);
   document.getElementById('loading-text').textContent = text;
 }
 
-// ============================================================
-// Canvas builder
-// ============================================================
 function buildCanvas(container, width = 680, height = 420) {
   container.innerHTML = '';
 
-  // Toolbar
   const toolbar = document.createElement('div');
   toolbar.className = 'toolbar';
 
-  // Colors
   const colors = [
     '#000000','#ffffff','#ef4444','#f97316','#f59e0b',
     '#22c55e','#3b82f6','#8b5cf6','#ec4899','#6b7280',
@@ -853,7 +903,6 @@ function buildCanvas(container, width = 680, height = 420) {
   swatchGroup.appendChild(swatchRow);
   toolbar.appendChild(swatchGroup);
 
-  // Size
   const sizeGroup = document.createElement('div');
   sizeGroup.className = 'tool-group';
   const sizeLabel = document.createElement('label');
@@ -864,7 +913,6 @@ function buildCanvas(container, width = 680, height = 420) {
   sizeGroup.appendChild(sizeSlider);
   toolbar.appendChild(sizeGroup);
 
-  // Tools
   const toolGroup = document.createElement('div');
   toolGroup.className = 'tool-group';
   let currentTool = 'pen';
@@ -905,7 +953,6 @@ function buildCanvas(container, width = 680, height = 420) {
   toolbar.appendChild(toolGroup);
   container.appendChild(toolbar);
 
-  // Canvas
   const canvas = document.createElement('canvas');
   canvas.width = 680;
   canvas.height = 420;
@@ -915,7 +962,6 @@ function buildCanvas(container, width = 680, height = 420) {
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Drawing logic
   let drawing = false;
   let lastX = 0, lastY = 0;
 
@@ -975,11 +1021,6 @@ function buildCanvas(container, width = 680, height = 420) {
   canvas.addEventListener('touchmove', draw, { passive: false });
   canvas.addEventListener('touchend', stopDraw, { passive: false });
 
-  // validate topic when host typing (enable start btn)
-  if (container.id === 'host-canvas-area') {
-    document.getElementById('topic-input').addEventListener('input', checkHostReady);
-  }
-
   return canvas;
 }
 
@@ -988,9 +1029,6 @@ function checkHostReady() {
   document.getElementById('start-btn').disabled = !topic;
 }
 
-// ============================================================
-// CREATE GAME
-// ============================================================
 async function createGame() {
   const name = document.getElementById('create-name').value.trim();
   if (!name) { toast('名前を入力してください', 'error'); return; }
@@ -1012,9 +1050,6 @@ async function createGame() {
   }
 }
 
-// ============================================================
-// JOIN GAME
-// ============================================================
 async function joinGame() {
   const code = document.getElementById('join-code').value.trim().toUpperCase();
   const name = document.getElementById('join-name').value.trim();
@@ -1035,9 +1070,6 @@ async function joinGame() {
   }
 }
 
-// ============================================================
-// LOBBY
-// ============================================================
 function enterLobby(game) {
   showScreen('screen-lobby');
   updateHeaderCode(state.code);
@@ -1049,8 +1081,9 @@ function enterLobby(game) {
   if (state.isHost) {
     document.getElementById('host-section').style.display = 'block';
     document.getElementById('guest-waiting').style.display = 'none';
-    // キャンバスを作る
-    hostCanvas = buildCanvas(document.getElementById('host-canvas-area'));
+    document.getElementById('topic-input').value = '';
+    document.getElementById('topic-input').oninput = checkHostReady;
+    document.getElementById('start-btn').disabled = true;
   } else {
     document.getElementById('host-section').style.display = 'none';
     document.getElementById('guest-waiting').style.display = 'block';
@@ -1085,26 +1118,18 @@ function copyUrl() {
   navigator.clipboard.writeText(url).then(() => toast('URLをコピーしました！', 'success'));
 }
 
-// ============================================================
-// START GAME (host)
-// ============================================================
 async function startGame() {
   const topic = document.getElementById('topic-input').value.trim();
   if (!topic) { toast('お題を入力してください', 'error'); return; }
-  if (!hostCanvas) { toast('キャンバスが見つかりません', 'error'); return; }
 
-  const imageData = hostCanvas.toDataURL('image/png');
   setLoading(true, 'ゲームを開始しています...');
   try {
-    await api('POST', `/api/game/${state.code}/start`, {
+    const game = await api('POST', `/api/game/${state.code}/start`, {
       playerId: state.playerId,
       topic,
-      imageData,
     });
     stopPolling();
-    // ホストは自分が描いたので待機画面へ
-    showWaiting('あなたの絵を送りました。次の人を待っています...');
-    startPolling();
+    enterDrawing(game.game);
   } catch (e) {
     toast('エラー: ' + e.message, 'error');
   } finally {
@@ -1112,9 +1137,6 @@ async function startGame() {
   }
 }
 
-// ============================================================
-// POLLING
-// ============================================================
 function startPolling() {
   stopPolling();
   pollOnce();
@@ -1130,17 +1152,14 @@ async function pollOnce() {
     const data = await api('GET', `/api/game/${state.code}/state?playerId=${state.playerId}`);
     handleStateUpdate(data);
   } catch (e) {
-    // silently ignore polling errors
   }
 }
 
 function handleStateUpdate(game) {
   const currentScreen = document.querySelector('.screen.active')?.id;
 
-  // ロビー中
   if (currentScreen === 'screen-lobby') {
     renderPlayers(game.players);
-    // ゲームが始まった
     if (game.status !== 'waiting') {
       stopPolling();
       if (game.myTurn) {
@@ -1153,7 +1172,6 @@ function handleStateUpdate(game) {
     return;
   }
 
-  // 待機中
   if (currentScreen === 'screen-waiting') {
     updateWaitingProgress(game);
 
@@ -1174,30 +1192,72 @@ function handleStateUpdate(game) {
   }
 }
 
-// ============================================================
-// DRAWING SCREEN (参加者)
-// ============================================================
 function enterDrawing(game) {
   showScreen('screen-drawing');
+  drawSubmitted = false;
+  stopTimer();
+
   document.getElementById('drawing-turn-badge').textContent =
     `${game.myIndex + 1}番目 / ${game.players.length}人中`;
 
-  // 前の人の絵
-  if (game.prevDrawing) {
-    document.getElementById('ref-image-box').style.display = 'block';
-    document.getElementById('ref-image').src = game.prevDrawing.imageData;
+  const topicBox = document.getElementById('topic-display');
+  if (game.topic) {
+    topicBox.style.display = 'flex';
+    document.getElementById('topic-display-value').textContent = game.topic;
   } else {
-    document.getElementById('ref-image-box').style.display = 'none';
+    topicBox.style.display = 'none';
   }
 
-  // キャンバス
-  drawCanvas = buildCanvas(document.getElementById('drawing-canvas-area'));
+  const overlay = document.getElementById('view-overlay');
+  const drawArea = document.getElementById('draw-area');
+  const countEl = document.getElementById('timer-count');
+  const fillEl = document.getElementById('timer-fill');
+  const labelEl = document.getElementById('timer-label');
+  const title = document.getElementById('drawing-title');
+
+  const beginDraw = (elapsedInDrawMs) => {
+    overlay.style.display = 'none';
+    document.getElementById('ref-image').src = '';
+    drawArea.style.display = 'block';
+    title.textContent = '✏️ 絵を描こう';
+    drawCanvas = buildCanvas(document.getElementById('drawing-canvas-area'));
+    runTimer({
+      seconds: DRAW_SECONDS,
+      elapsedMs: elapsedInDrawMs,
+      countEl, fillEl, labelEl,
+      label: '描く時間',
+      onDone: () => submitDrawing(true),
+    });
+  };
+
+  if (game.prevDrawing) {
+    const elapsed = game.elapsedMs || 0;
+    if (elapsed >= VIEW_SECONDS * 1000) {
+      beginDraw(elapsed - VIEW_SECONDS * 1000);
+      return;
+    }
+    drawArea.style.display = 'none';
+    overlay.style.display = 'block';
+    title.textContent = '👀 絵を覚えよう';
+    document.getElementById('ref-image').src = game.prevDrawing.imageData;
+    runTimer({
+      seconds: VIEW_SECONDS,
+      elapsedMs: elapsed,
+      countEl, fillEl, labelEl,
+      label: '見る時間',
+      onDone: () => beginDraw(0),
+    });
+  } else {
+    beginDraw(game.elapsedMs || 0);
+  }
 }
 
-async function submitDrawing() {
-  if (!drawCanvas) return;
+async function submitDrawing(auto = false) {
+  if (!drawCanvas || drawSubmitted) return;
+  drawSubmitted = true;
+  stopTimer();
   const imageData = drawCanvas.toDataURL('image/png');
-  setLoading(true, '絵を送っています...');
+  setLoading(true, auto ? '時間切れ！絵を送っています...' : '絵を送っています...');
   try {
     await api('POST', `/api/game/${state.code}/submit`, {
       playerId: state.playerId,
@@ -1207,15 +1267,13 @@ async function submitDrawing() {
     showWaiting('絵を送りました！次の人を待っています...');
     startPolling();
   } catch (e) {
+    drawSubmitted = false;
     toast('エラー: ' + e.message, 'error');
   } finally {
     setLoading(false);
   }
 }
 
-// ============================================================
-// WAITING SCREEN
-// ============================================================
 function showWaiting(msg) {
   showScreen('screen-waiting');
   document.getElementById('waiting-msg').textContent = msg;
@@ -1240,14 +1298,45 @@ function updateWaitingProgress(game) {
   });
 }
 
-// ============================================================
-// GUESS SCREEN
-// ============================================================
 function enterGuess(game) {
   showScreen('screen-guess');
-  if (game.prevDrawing) {
-    document.getElementById('guess-image').src = game.prevDrawing.imageData;
+  stopTimer();
+
+  const imageBox = document.getElementById('guess-image-box');
+  const field = document.getElementById('guess-field');
+  const btn = document.getElementById('guess-btn');
+  const img = document.getElementById('guess-image');
+  const input = document.getElementById('guess-input');
+  input.value = '';
+
+  const showInput = () => {
+    imageBox.style.display = 'none';
+    img.src = '';
+    field.style.display = 'block';
+    btn.style.display = 'flex';
+    document.getElementById('guess-timer-bar').style.display = 'none';
+    input.focus();
+  };
+
+  const elapsed = game.elapsedMs || 0;
+  if (elapsed >= VIEW_SECONDS * 1000) {
+    showInput();
+    return;
   }
+
+  imageBox.style.display = 'block';
+  field.style.display = 'none';
+  btn.style.display = 'none';
+  document.getElementById('guess-timer-bar').style.display = 'flex';
+  if (game.prevDrawing) img.src = game.prevDrawing.imageData;
+
+  runTimer({
+    seconds: VIEW_SECONDS,
+    elapsedMs: elapsed,
+    countEl: document.getElementById('guess-timer-count'),
+    fillEl: document.getElementById('guess-timer-fill'),
+    onDone: showInput,
+  });
 }
 
 async function submitGuess() {
@@ -1267,14 +1356,12 @@ async function submitGuess() {
   }
 }
 
-// ============================================================
-// RESULT
-// ============================================================
 async function loadResult() {
   setLoading(true, '結果を取得中...');
   try {
     const data = await api('GET', `/api/game/${state.code}/result`);
     stopPolling();
+    stopTimer();
     showResult(data);
   } catch (e) {
     toast('エラー: ' + e.message, 'error');
@@ -1287,7 +1374,6 @@ async function loadResult() {
 function showResult(data) {
   showScreen('screen-result');
 
-  // Reveal
   const reveal = document.getElementById('result-reveal');
   reveal.innerHTML = `
     <div class="verdict">${data.correct ? '🎉' : '😅'}</div>
@@ -1300,7 +1386,6 @@ function showResult(data) {
     <div class="guess-chip">「${data.guess?.text || '(なし)'}」</div>
   `;
 
-  // Timeline
   const timeline = document.getElementById('timeline');
   timeline.innerHTML = `<h3 style="margin-bottom:12px">📜 絵の流れ</h3>`;
 
@@ -1328,9 +1413,6 @@ function showResult(data) {
   }
 }
 
-// ============================================================
-// Util
-// ============================================================
 function updateHeaderCode(code) {
   document.getElementById('header-code').style.display = 'block';
   document.getElementById('header-code-text').textContent = code;
@@ -1338,11 +1420,10 @@ function updateHeaderCode(code) {
 
 function resetGame() {
   stopPolling();
+  stopTimer();
   state = { code: null, playerId: null, playerName: null, isHost: false, pollTimer: null };
-  hostCanvas = null;
   drawCanvas = null;
   document.getElementById('header-code').style.display = 'none';
-  // 入力欄をリセット
   document.getElementById('create-name').value = '';
   document.getElementById('join-code').value = '';
   document.getElementById('join-name').value = '';
