@@ -431,6 +431,7 @@
     flex-direction: column;
   }
   #submit-drawing-btn { flex-shrink: 0; padding: 10px 22px; }
+  .skip-btn { flex-shrink: 0; margin-top: 8px; padding: 10px 22px; }
 
   .canvas-stage {
     flex: 1;
@@ -884,6 +885,7 @@
     <div class="view-overlay" id="view-overlay" style="display:none">
       <p id="view-hint"></p>
       <div class="fit-img"><img id="ref-image" src="" alt="前の人の絵"></div>
+      <button class="btn btn-success btn-full skip-btn" onclick="skipView()"><i class="fa-solid fa-check"></i> 覚えた！描き始める</button>
     </div>
 
     <div id="draw-area" style="display:none">
@@ -916,6 +918,7 @@
       <div class="ref-image-box" id="guess-image-box">
         <p>最後に届いた絵</p>
         <div class="fit-img"><img id="guess-image" src="" alt="最後の絵"></div>
+        <button class="btn btn-success btn-full skip-btn" onclick="skipView()"><i class="fa-solid fa-check"></i> 覚えた！答える</button>
       </div>
       <div id="guess-input-area" style="display:none">
         <div class="field">
@@ -980,6 +983,7 @@ let state = {
 let drawCanvas = null;
 let timerHandle = null;
 let drawSubmitted = false;
+let skipHandler = null;
 
 let lobbyPlayerCount = 0;
 let lobbyMaxPlayers = 0;
@@ -988,6 +992,13 @@ let lobbyAllPresent = true;
 
 function esc(s) {
   return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function skipView() {
+  if (!skipHandler) return;
+  const handler = skipHandler;
+  skipHandler = null;
+  handler();
 }
 
 function stopTimer() {
@@ -1613,6 +1624,7 @@ function handleStateUpdate(game) {
 function enterDrawing(game) {
   showScreen('screen-drawing');
   drawSubmitted = false;
+  skipHandler = null;
   stopTimer();
 
   document.getElementById('drawing-turn-badge').textContent =
@@ -1634,6 +1646,7 @@ function enterDrawing(game) {
   const title = document.getElementById('drawing-title');
 
   const beginDraw = (elapsedInDrawMs) => {
+    skipHandler = null;
     overlay.style.display = 'none';
     document.getElementById('ref-image').src = '';
     drawArea.style.display = 'flex';
@@ -1658,6 +1671,10 @@ function enterDrawing(game) {
     overlay.style.display = 'flex';
     title.innerHTML = '<i class="fa-solid fa-eye"></i> 絵を覚えよう';
     document.getElementById('ref-image').src = game.prevDrawing.imageData;
+    skipHandler = () => {
+      stopTimer();
+      beginDraw(0);
+    };
     runTimer({
       seconds: VIEW_SECONDS,
       elapsedMs: elapsed,
@@ -1711,6 +1728,7 @@ function updateWaitingProgress(game) {
 
 function enterGuess(game) {
   showScreen('screen-guess');
+  skipHandler = null;
   stopTimer();
 
   const imageBox = document.getElementById('guess-image-box');
@@ -1720,6 +1738,7 @@ function enterGuess(game) {
   input.value = '';
 
   const showInput = () => {
+    skipHandler = null;
     imageBox.style.display = 'none';
     img.src = '';
     inputArea.style.display = 'flex';
@@ -1737,6 +1756,11 @@ function enterGuess(game) {
   inputArea.style.display = 'none';
   document.getElementById('guess-timer-bar').style.display = 'flex';
   if (game.prevDrawing) img.src = game.prevDrawing.imageData;
+
+  skipHandler = () => {
+    stopTimer();
+    showInput();
+  };
 
   runTimer({
     seconds: VIEW_SECONDS,
