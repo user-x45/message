@@ -39,11 +39,17 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
   body {
     font-family: 'Noto Sans JP', sans-serif;
     background: var(--bg);
     color: var(--text);
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -51,7 +57,8 @@
 
   header {
     width: 100%;
-    padding: 16px 24px;
+    flex-shrink: 0;
+    padding: 10px 20px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     display: flex;
@@ -59,7 +66,7 @@
     gap: 12px;
   }
   .logo {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 900;
     letter-spacing: -0.5px;
   }
@@ -69,7 +76,7 @@
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 4px 12px;
+    padding: 3px 12px;
     font-size: 0.8rem;
     color: var(--text-muted);
   }
@@ -77,37 +84,46 @@
 
   main {
     width: 100%;
-    max-width: 860px;
-    padding: 32px 16px;
+    max-width: 960px;
+    padding: 12px 16px;
     flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .screen { display: none; }
-  .screen.active { display: block; }
+  .screen.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  .screen.center.active { justify-content: center; }
 
   .hero {
     text-align: center;
-    padding: 48px 0 40px;
+    padding: 0 0 clamp(16px, 4vh, 36px);
   }
   .hero h1 {
-    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-size: clamp(1.8rem, min(6vw, 8vh), 3.5rem);
     font-weight: 900;
     line-height: 1.1;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   .hero h1 em { color: var(--accent); font-style: normal; }
   .hero h1 i { color: var(--accent2); }
   .hero p {
     color: var(--text-muted);
-    font-size: 1.05rem;
-    margin-bottom: 40px;
+    font-size: 1rem;
   }
 
   .home-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 16px;
     max-width: 520px;
+    width: 100%;
     margin: 0 auto;
   }
   @media (max-width: 500px) { .home-actions { grid-template-columns: 1fr; } }
@@ -116,33 +132,35 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 28px 20px;
+    padding: clamp(14px, 3.5vh, 28px) 20px;
     cursor: pointer;
     transition: border-color 0.2s, transform 0.15s;
     text-align: center;
   }
   .action-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .action-card .icon { font-size: 2.5rem; margin-bottom: 12px; color: var(--accent); }
-  .action-card h2 { font-size: 1.1rem; margin-bottom: 6px; }
+  .action-card .icon { font-size: clamp(1.8rem, 5vh, 2.5rem); margin-bottom: 8px; color: var(--accent); }
+  .action-card h2 { font-size: 1.1rem; margin-bottom: 4px; }
   .action-card p { font-size: 0.85rem; color: var(--text-muted); }
 
   .form-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 32px;
+    padding: clamp(16px, 4vh, 32px);
     max-width: 460px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
     margin: 0 auto;
   }
-  .form-card h2 { font-size: 1.3rem; margin-bottom: 24px; }
+  .form-card h2 { font-size: 1.3rem; margin-bottom: clamp(12px, 3vh, 24px); }
 
-  .field { margin-bottom: 18px; }
+  .field { margin-bottom: 14px; }
   .field label {
     display: block;
     font-size: 0.82rem;
     color: var(--text-muted);
     margin-bottom: 6px;
-    text-transform: uppercase;
     letter-spacing: 0.5px;
   }
   .field input, .field select {
@@ -167,7 +185,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 24px;
+    padding: 11px 22px;
     border-radius: 8px;
     font-size: 0.95rem;
     font-family: inherit;
@@ -194,67 +212,84 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     padding: 0;
     transition: color 0.2s;
+    align-self: flex-start;
   }
   .back-btn:hover { color: var(--text); }
 
   .lobby-header {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 8px;
   }
-  .lobby-header h2 { font-size: 1.3rem; }
+  .lobby-header h2 { font-size: 1.2rem; }
 
   .invite-box {
+    flex-shrink: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 20px 24px;
-    margin-bottom: 24px;
+    padding: 10px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
   }
-  .invite-box h3 { font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .invite-box h3 { font-size: 0.82rem; color: var(--text-muted); letter-spacing: 0.5px; }
   .invite-code {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 900;
-    letter-spacing: 6px;
+    letter-spacing: 5px;
     color: var(--accent2);
-    margin-bottom: 12px;
+    line-height: 1.1;
   }
   .invite-url {
-    font-size: 0.8rem;
+    flex: 1 1 180px;
+    min-width: 0;
+    font-size: 0.78rem;
     color: var(--text-muted);
-    word-break: break-all;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     background: var(--bg);
     border-radius: 6px;
     padding: 8px 10px;
-    margin-bottom: 12px;
     font-family: monospace;
   }
   .copy-row { display: flex; gap: 8px; }
+  .copy-row .btn { padding: 8px 14px; font-size: 0.85rem; }
 
   .player-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    align-content: start;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-    margin-bottom: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
   }
   .player-chip {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 0.9rem;
+    padding: 7px 10px;
+    font-size: 0.88rem;
     display: flex;
     align-items: center;
     gap: 8px;
+    min-width: 0;
   }
+  .player-chip > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .player-chip .avatar {
-    width: 28px; height: 28px;
+    width: 26px; height: 26px;
     border-radius: 50%;
     background: var(--surface2);
     display: flex; align-items: center; justify-content: center;
@@ -265,16 +300,21 @@
   }
   .player-chip.host { border-color: var(--accent2); }
   .player-chip.me { border-color: var(--accent3); }
+  .player-chip.away { opacity: 0.45; border-style: dashed; }
+
+  .lobby-bottom { flex-shrink: 0; }
+  .lobby-hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; }
 
   .drawing-header {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     flex-wrap: wrap;
     gap: 8px;
   }
-  .drawing-header h2 { font-size: 1.1rem; }
+  .drawing-header h2 { font-size: 1.05rem; }
   .turn-badge {
     background: var(--surface2);
     border-radius: 6px;
@@ -284,12 +324,13 @@
   }
 
   .topic-display {
+    flex-shrink: 0;
     background: var(--surface);
     border: 2px solid var(--accent2);
     border-radius: var(--radius);
-    padding: 14px 20px;
-    margin-bottom: 14px;
-    font-size: 1.05rem;
+    padding: 8px 16px;
+    margin-bottom: 8px;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -297,35 +338,53 @@
   .topic-display .label {
     font-size: 0.75rem;
     color: var(--text-muted);
-    text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
   }
   .topic-display .value { font-weight: 700; color: var(--accent2); }
 
   .ref-image-box {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 12px;
-    margin-bottom: 14px;
+    padding: 10px;
+    margin-bottom: 10px;
   }
-  .ref-image-box p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
-  .ref-image-box img { max-width: 100%; border-radius: 6px; display: block; }
+  .ref-image-box p { flex-shrink: 0; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+
+  .fit-img {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+  .fit-img img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    display: block;
+  }
 
   .timer-bar {
+    flex-shrink: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 10px 14px;
-    margin-bottom: 14px;
+    padding: 6px 14px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     gap: 12px;
   }
   .timer-label { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
   .timer-count {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 900;
     min-width: 2.4ch;
     text-align: right;
@@ -348,23 +407,44 @@
   .timer-fill.danger { background: var(--accent); }
 
   .view-overlay {
+    flex: 1;
+    min-height: 0;
     background: var(--surface);
     border: 2px solid var(--accent3);
     border-radius: var(--radius);
-    padding: 14px;
-    margin-bottom: 14px;
+    padding: 10px;
     text-align: center;
+    flex-direction: column;
   }
-  .view-overlay img {
-    max-width: 100%;
-    border-radius: 6px;
-    display: block;
-    margin: 0 auto;
-    background: #fff;
+  .view-overlay p { flex-shrink: 0; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+
+  #draw-area {
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    gap: 8px;
   }
-  .view-overlay p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
+  #drawing-canvas-area {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  #submit-drawing-btn { flex-shrink: 0; padding: 10px 22px; }
 
   .canvas-stage {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .canvas-box {
     position: relative;
     line-height: 0;
   }
@@ -395,21 +475,13 @@
   .brush-cursor::before { width: 5px; height: 1px; }
   .brush-cursor::after { width: 1px; height: 5px; }
 
-  .canvas-wrap {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px;
-    margin-bottom: 14px;
-  }
-
   .toolbar {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px 8px;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .tool-group {
@@ -418,7 +490,7 @@
     gap: 6px;
     background: var(--bg);
     border-radius: 8px;
-    padding: 4px 8px;
+    padding: 3px 8px;
   }
   .tool-group label {
     font-size: 0.75rem;
@@ -428,11 +500,11 @@
 
   .color-swatches {
     display: flex;
-    gap: 5px;
+    gap: 4px;
     flex-wrap: wrap;
   }
   .swatch {
-    width: 22px; height: 22px;
+    width: 20px; height: 20px;
     border-radius: 50%;
     border: 2px solid transparent;
     cursor: pointer;
@@ -453,7 +525,7 @@
     border-radius: 2px;
     outline: none;
     cursor: pointer;
-    width: 80px;
+    width: 72px;
   }
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -479,6 +551,10 @@
   }
   .tool-btn:hover { background: var(--surface); }
   .tool-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  @media (max-width: 640px) {
+    .tool-btn .txt { display: none; }
+    .tool-btn { padding: 6px 9px; }
+  }
 
   canvas {
     display: block;
@@ -486,6 +562,7 @@
     cursor: none;
     touch-action: none;
     width: 100%;
+    height: 100%;
     background: #ffffff;
   }
 
@@ -493,103 +570,143 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 40px 32px;
+    padding: clamp(20px, 5vh, 40px) 28px;
     text-align: center;
   }
-  .waiting-icon { font-size: 3rem; margin-bottom: 16px; color: var(--accent2); }
+  .waiting-box.compact { padding: 14px 20px; }
+  .waiting-box.compact .waiting-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .waiting-box.compact p { margin-bottom: 0; }
+  .waiting-icon { font-size: clamp(2rem, 6vh, 3rem); margin-bottom: 12px; color: var(--accent2); }
   .host-crown { color: var(--accent2); }
   .btn i, .back-btn i, .tool-btn i { font-size: 0.9em; }
   .tool-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .tool-btn:disabled:hover { background: var(--surface2); }
   .waiting-box h2 { font-size: 1.2rem; margin-bottom: 8px; }
-  .waiting-box p { color: var(--text-muted); margin-bottom: 24px; }
+  .waiting-box p { color: var(--text-muted); margin-bottom: 16px; }
+  .button-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
   .progress-steps {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0;
-    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
   }
   .step-dot {
-    width: 28px; height: 28px;
+    width: 26px; height: 26px;
     border-radius: 50%;
     background: var(--surface2);
     border: 2px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: var(--text-muted);
     transition: all 0.3s;
   }
   .step-dot.done { background: var(--accent3); border-color: var(--accent3); color: #1a1a2e; }
   .step-dot.current { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .step-line {
-    height: 2px;
-    width: 32px;
-    background: var(--surface2);
-  }
-  .step-line.done { background: var(--accent3); }
 
-  .guess-section { max-width: 560px; margin: 0 auto; }
-  .guess-section h2 { font-size: 1.2rem; margin-bottom: 8px; }
-  .guess-section p { color: var(--text-muted); margin-bottom: 20px; }
+  .guess-section {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .guess-section h2 { flex-shrink: 0; font-size: 1.1rem; margin-bottom: 4px; }
+  .guess-section > p { flex-shrink: 0; color: var(--text-muted); font-size: 0.88rem; margin-bottom: 10px; }
+  #guess-input-area {
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+  }
+  #guess-input-area .field { margin-bottom: 0; }
 
   .result-reveal {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-  .result-reveal .verdict {
-    font-size: 3rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 18px;
     margin-bottom: 8px;
-    color: var(--accent2);
   }
-  .result-reveal h2 { font-size: 1.5rem; margin-bottom: 6px; }
+  .result-reveal h2 { font-size: 1.15rem; }
+  .reveal-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
   .result-reveal .topic-chip {
-    display: inline-block;
     background: var(--surface2);
     border-radius: 6px;
-    padding: 4px 14px;
+    padding: 3px 12px;
     color: var(--accent2);
     font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 8px;
+    font-size: 1rem;
   }
   .result-reveal .guess-chip {
-    display: inline-block;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 4px 14px;
+    padding: 3px 12px;
     color: var(--text);
     font-size: 1rem;
   }
 
   .timeline {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 32px;
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    gap: 8px;
+    overflow: hidden;
   }
   .timeline-item {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
+    border-radius: 10px;
+    padding: 8px;
   }
   .timeline-item .who {
-    font-size: 0.8rem;
+    flex-shrink: 0;
+    font-size: 0.75rem;
     color: var(--text-muted);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   .timeline-item .who strong { color: var(--text); }
-  .timeline-item img {
-    max-width: 100%;
-    border-radius: 6px;
-    display: block;
-    background: #fff;
+  .timeline-item .answer-text {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 700;
+    font-size: clamp(1rem, 2.6vw, 1.6rem);
+    word-break: break-all;
+    overflow: hidden;
+  }
+  .result-actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
   }
 
   #toast-container {
@@ -658,7 +775,7 @@
 
 <main>
 
-  <div class="screen active" id="screen-home">
+  <div class="screen center active" id="screen-home">
     <div class="hero">
       <h1><i class="fa-solid fa-palette"></i> お絵描き<br><em>伝言ゲーム</em></h1>
       <p>絵で伝える、絵で当てる。みんなでワイワイ楽しもう！</p>
@@ -677,7 +794,7 @@
     </div>
   </div>
 
-  <div class="screen" id="screen-create">
+  <div class="screen center" id="screen-create">
     <button class="back-btn" onclick="showScreen('screen-home')"><i class="fa-solid fa-arrow-left"></i> 戻る</button>
     <div class="form-card">
       <h2><i class="fa-solid fa-house"></i> ゲームを作る</h2>
@@ -693,7 +810,7 @@
     </div>
   </div>
 
-  <div class="screen" id="screen-join">
+  <div class="screen center" id="screen-join">
     <button class="back-btn" onclick="showScreen('screen-home')"><i class="fa-solid fa-arrow-left"></i> 戻る</button>
     <div class="form-card">
       <h2><i class="fa-solid fa-door-open"></i> ゲームに参加する</h2>
@@ -727,20 +844,22 @@
 
     <div class="player-list" id="player-list"></div>
 
-    <div id="host-section" style="display:none">
-      <div class="field">
-        <label>お題を入力してください</label>
-        <input type="text" id="topic-input" placeholder="例: ねこ、富士山、ラーメン..." maxlength="20">
+    <div class="lobby-bottom">
+      <div id="host-section" style="display:none">
+        <div class="field">
+          <label>お題を入力してください</label>
+          <input type="text" id="topic-input" placeholder="例: ねこ、富士山、ラーメン..." maxlength="20">
+        </div>
+        <p class="lobby-hint" id="lobby-hint"></p>
+        <button class="btn btn-primary btn-full" id="start-btn" onclick="startGame()" disabled>ゲームを開始する <i class="fa-solid fa-arrow-right"></i></button>
       </div>
-      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">全員そろってお題を入力すると開始できます。開始後、30秒でその絵を描きます。参加者には絵だけが10秒間見え、お題は秘密です。</p>
-      <button class="btn btn-primary btn-full" id="start-btn" onclick="startGame()" disabled>ゲームを開始する <i class="fa-solid fa-arrow-right"></i></button>
-    </div>
 
-    <div id="guest-waiting" style="display:none">
-      <div class="waiting-box">
-        <div class="waiting-icon"><i class="fa-solid fa-hourglass-half"></i></div>
-        <h2>ホストの準備を待っています</h2>
-        <p>ホストがお題を決めてゲームを始めるまでお待ちください。</p>
+      <div id="guest-waiting" style="display:none">
+        <div class="waiting-box compact">
+          <div class="waiting-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+          <h2>ホストの準備を待っています</h2>
+          <p>ホストがお題を決めてゲームを始めるまでお待ちください。</p>
+        </div>
       </div>
     </div>
   </div>
@@ -758,24 +877,24 @@
 
     <div class="timer-bar">
       <span class="timer-label" id="timer-label">残り</span>
-      <span class="timer-count" id="timer-count">30</span>
+      <span class="timer-count" id="timer-count"></span>
       <div class="timer-track"><div class="timer-fill" id="timer-fill"></div></div>
     </div>
 
     <div class="view-overlay" id="view-overlay" style="display:none">
-      <p>前の人の絵です。10秒間だけ見られます。よく覚えてください！</p>
-      <img id="ref-image" src="" alt="前の人の絵">
+      <p id="view-hint"></p>
+      <div class="fit-img"><img id="ref-image" src="" alt="前の人の絵"></div>
     </div>
 
     <div id="draw-area" style="display:none">
       <div id="drawing-canvas-area"></div>
-      <button class="btn btn-success btn-full" id="submit-drawing-btn" onclick="submitDrawing()" style="margin-top:12px">
+      <button class="btn btn-success btn-full" id="submit-drawing-btn" onclick="submitDrawing()">
         絵を送る <i class="fa-solid fa-arrow-right"></i>
       </button>
     </div>
   </div>
 
-  <div class="screen" id="screen-waiting">
+  <div class="screen center" id="screen-waiting">
     <div class="waiting-box">
       <div class="waiting-icon"><i class="fa-solid fa-palette"></i></div>
       <h2>提出しました！次の人を待っています</h2>
@@ -788,37 +907,43 @@
   <div class="screen" id="screen-guess">
     <div class="guess-section">
       <h2><i class="fa-solid fa-magnifying-glass"></i> お題を当てよう！</h2>
-      <p>最後の絵を見て、最初のお題が何だったか当ててください。絵は10秒間だけ見られます。</p>
+      <p id="guess-hint"></p>
       <div class="timer-bar" id="guess-timer-bar">
         <span class="timer-label">残り</span>
-        <span class="timer-count" id="guess-timer-count">10</span>
+        <span class="timer-count" id="guess-timer-count"></span>
         <div class="timer-track"><div class="timer-fill" id="guess-timer-fill"></div></div>
       </div>
       <div class="ref-image-box" id="guess-image-box">
         <p>最後に届いた絵</p>
-        <img id="guess-image" src="" alt="最後の絵">
+        <div class="fit-img"><img id="guess-image" src="" alt="最後の絵"></div>
       </div>
-      <div class="field" id="guess-field" style="display:none">
-        <label>あなたの答え</label>
-        <input type="text" id="guess-input" placeholder="お題を入力..." maxlength="20">
+      <div id="guess-input-area" style="display:none">
+        <div class="field">
+          <label>あなたの答え</label>
+          <input type="text" id="guess-input" placeholder="お題を入力..." maxlength="20">
+        </div>
+        <button class="btn btn-success btn-full" id="guess-btn" onclick="submitGuess()">答えを送る <i class="fa-solid fa-arrow-right"></i></button>
       </div>
-      <button class="btn btn-success btn-full" id="guess-btn" onclick="submitGuess()" style="display:none">答えを送る <i class="fa-solid fa-arrow-right"></i></button>
     </div>
   </div>
 
-  <div class="screen" id="screen-aborted">
+  <div class="screen center" id="screen-aborted">
     <div class="waiting-box">
       <div class="waiting-icon"><i class="fa-solid fa-door-open"></i></div>
       <h2>ゲーム終了</h2>
       <p id="aborted-msg">誰かが退出したため、ゲームを終了しました。</p>
-      <button class="btn btn-primary" onclick="showScreen('screen-home');resetGame()"><i class="fa-solid fa-house"></i> トップに戻る</button>
+      <div class="button-row">
+        <button class="btn btn-success" onclick="rematch()"><i class="fa-solid fa-rotate-right"></i> 同じルームで続ける</button>
+        <button class="btn btn-primary" onclick="showScreen('screen-home');resetGame()"><i class="fa-solid fa-house"></i> トップに戻る</button>
+      </div>
     </div>
   </div>
 
   <div class="screen" id="screen-result">
     <div class="result-reveal" id="result-reveal"></div>
     <div class="timeline" id="timeline"></div>
-    <div style="text-align:center">
+    <div class="result-actions">
+      <button class="btn btn-success" onclick="rematch()"><i class="fa-solid fa-rotate-right"></i> 同じルームで続ける</button>
       <button class="btn btn-primary" onclick="showScreen('screen-home');resetGame()"><i class="fa-solid fa-house"></i> トップに戻る</button>
     </div>
   </div>
@@ -837,22 +962,33 @@
 <script>
 const API_BASE = 'https://message-server.user-x45.workers.dev';
 
+const VIEW_SECONDS = 30;
+const DRAW_SECONDS = 60;
+const CANVAS_W = 680;
+const CANVAS_H = 420;
+
 let state = {
   code: null,
   playerId: null,
   playerName: null,
   isHost: false,
+  round: 0,
   pollTimer: null,
   ended: false,
 };
 
 let drawCanvas = null;
-
-const VIEW_SECONDS = 10;
-const DRAW_SECONDS = 30;
-
 let timerHandle = null;
 let drawSubmitted = false;
+
+let lobbyPlayerCount = 0;
+let lobbyMaxPlayers = 0;
+let lobbyRound = 0;
+let lobbyAllPresent = true;
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 
 function stopTimer() {
   if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
@@ -885,12 +1021,25 @@ function runTimer({ seconds, elapsedMs = 0, countEl, fillEl, labelEl, label, onT
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lobby-hint').textContent =
+    `全員そろってお題を入力すると開始できます。開始後、${DRAW_SECONDS}秒でその絵を描きます。参加者には絵だけが${VIEW_SECONDS}秒間見え、お題は秘密です。`;
+  document.getElementById('view-hint').textContent =
+    `前の人の絵です。${VIEW_SECONDS}秒間だけ見られます。よく覚えてください！`;
+  document.getElementById('guess-hint').textContent =
+    `最後の絵を見て、最初のお題が何だったか当ててください。絵は${VIEW_SECONDS}秒間だけ見られます。`;
+  document.getElementById('timer-count').textContent = DRAW_SECONDS;
+  document.getElementById('guess-timer-count').textContent = VIEW_SECONDS;
+
   const params = new URLSearchParams(location.search);
   const code = params.get('code');
   if (code && /^[A-Z0-9]{6}$/.test(code.toUpperCase())) {
     document.getElementById('join-code').value = code.toUpperCase();
     showScreen('screen-join');
   }
+});
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('screen-result').classList.contains('active')) fitTimeline();
 });
 
 function showScreen(id) {
@@ -923,7 +1072,7 @@ function setLoading(show, text = '処理中...') {
   document.getElementById('loading-text').textContent = text;
 }
 
-function buildCanvas(container, width = 680, height = 420) {
+function buildCanvas(container) {
   container.innerHTML = '';
 
   const toolbar = document.createElement('div');
@@ -954,6 +1103,7 @@ function buildCanvas(container, width = 680, height = 420) {
       currentTool = 'pen';
       document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
       sw.classList.add('active');
+      penBtn.classList.add('active');
       eraserBtn.classList.remove('active');
     };
     swatchRow.appendChild(sw);
@@ -977,7 +1127,8 @@ function buildCanvas(container, width = 680, height = 420) {
 
   const penBtn = document.createElement('button');
   penBtn.className = 'tool-btn active';
-  penBtn.innerHTML = '<i class="fa-solid fa-pencil"></i> ペン';
+  penBtn.title = 'ペン';
+  penBtn.innerHTML = '<i class="fa-solid fa-pencil"></i><span class="txt"> ペン</span>';
   penBtn.onclick = () => {
     currentTool = 'pen';
     penBtn.classList.add('active');
@@ -989,7 +1140,8 @@ function buildCanvas(container, width = 680, height = 420) {
 
   const eraserBtn = document.createElement('button');
   eraserBtn.className = 'tool-btn';
-  eraserBtn.innerHTML = '<i class="fa-solid fa-eraser"></i> 消しゴム';
+  eraserBtn.title = '消しゴム';
+  eraserBtn.innerHTML = '<i class="fa-solid fa-eraser"></i><span class="txt"> 消しゴム</span>';
   eraserBtn.onclick = () => {
     currentTool = 'eraser';
     eraserBtn.classList.add('active');
@@ -999,7 +1151,8 @@ function buildCanvas(container, width = 680, height = 420) {
 
   const clearBtn = document.createElement('button');
   clearBtn.className = 'tool-btn';
-  clearBtn.innerHTML = '<i class="fa-solid fa-trash"></i> 全消し';
+  clearBtn.title = '全消し';
+  clearBtn.innerHTML = '<i class="fa-solid fa-trash"></i><span class="txt"> 全消し</span>';
   clearBtn.onclick = () => {
     pushHistory();
     ctx.fillStyle = '#ffffff';
@@ -1018,14 +1171,14 @@ function buildCanvas(container, width = 680, height = 420) {
   undoBtn.className = 'tool-btn';
   undoBtn.type = 'button';
   undoBtn.title = '元に戻す (Ctrl+Z)';
-  undoBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 元に戻す';
+  undoBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i><span class="txt"> 元に戻す</span>';
   undoBtn.disabled = true;
 
   const redoBtn = document.createElement('button');
   redoBtn.className = 'tool-btn';
   redoBtn.type = 'button';
   redoBtn.title = 'やり直す (Ctrl+Shift+Z)';
-  redoBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> やり直す';
+  redoBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i><span class="txt"> やり直す</span>';
   redoBtn.disabled = true;
 
   historyGroup.appendChild(undoBtn);
@@ -1037,14 +1190,32 @@ function buildCanvas(container, width = 680, height = 420) {
   stage.className = 'canvas-stage';
   container.appendChild(stage);
 
+  const box = document.createElement('div');
+  box.className = 'canvas-box';
+  stage.appendChild(box);
+
   const canvas = document.createElement('canvas');
-  canvas.width = 680;
-  canvas.height = 420;
-  stage.appendChild(canvas);
+  canvas.width = CANVAS_W;
+  canvas.height = CANVAS_H;
+  box.appendChild(canvas);
 
   const brushCursor = document.createElement('div');
   brushCursor.className = 'brush-cursor';
-  stage.appendChild(brushCursor);
+  box.appendChild(brushCursor);
+
+  const fitCanvas = () => {
+    const w = stage.clientWidth - 16;
+    const h = stage.clientHeight - 16;
+    if (w <= 0 || h <= 0) return;
+    const scale = Math.min(w / CANVAS_W, h / CANVAS_H);
+    box.style.width = Math.max(1, Math.floor(CANVAS_W * scale)) + 'px';
+    box.style.height = Math.max(1, Math.floor(CANVAS_H * scale)) + 'px';
+  };
+  const observer = new ResizeObserver(() => {
+    if (!stage.isConnected) { observer.disconnect(); return; }
+    fitCanvas();
+  });
+  observer.observe(stage);
 
   function updateCursor(e) {
     if (e.pointerType && e.pointerType === 'touch') return;
@@ -1164,13 +1335,8 @@ function buildCanvas(container, width = 680, height = 420) {
     ctx.lineWidth = parseInt(sizeSlider.value);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    if (currentTool === 'eraser') {
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.strokeStyle = '#ffffff';
-    } else {
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.strokeStyle = currentColor;
-    }
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = currentTool === 'eraser' ? '#ffffff' : currentColor;
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
@@ -1195,17 +1361,19 @@ function buildCanvas(container, width = 680, height = 420) {
   return canvas;
 }
 
-let lobbyPlayerCount = 0;
-let lobbyMaxPlayers = 0;
-
 function checkHostReady() {
   const topic = document.getElementById('topic-input').value.trim();
-  const full = lobbyPlayerCount >= lobbyMaxPlayers && lobbyMaxPlayers > 0;
+  const need = lobbyRound > 0 ? 2 : lobbyMaxPlayers;
+  const enough = lobbyMaxPlayers > 0 && lobbyPlayerCount >= need;
   const btn = document.getElementById('start-btn');
-  btn.disabled = !(topic && full);
-  btn.innerHTML = full
-    ? 'ゲームを開始する <i class="fa-solid fa-arrow-right"></i>'
-    : `あと${Math.max(0, lobbyMaxPlayers - lobbyPlayerCount)}人待っています...`;
+  btn.disabled = !(topic && enough && lobbyAllPresent);
+  if (!enough) {
+    btn.innerHTML = `あと${Math.max(0, need - lobbyPlayerCount)}人待っています...`;
+  } else if (!lobbyAllPresent) {
+    btn.innerHTML = 'みんなの復帰を待っています...';
+  } else {
+    btn.innerHTML = 'ゲームを開始する <i class="fa-solid fa-arrow-right"></i>';
+  }
 }
 
 async function createGame() {
@@ -1226,7 +1394,6 @@ async function createGame() {
     state.code = data.code;
     state.playerId = data.hostId;
     state.playerName = name;
-    state.isHost = true;
     enterLobby(data.game);
   } catch (e) {
     toast('エラー: ' + e.message, 'error');
@@ -1246,7 +1413,6 @@ async function joinGame() {
     state.code = code;
     state.playerId = data.playerId;
     state.playerName = name;
-    state.isHost = false;
     enterLobby(data.game);
   } catch (e) {
     toast('エラー: ' + e.message, 'error');
@@ -1255,7 +1421,16 @@ async function joinGame() {
   }
 }
 
+function applyLobbyRole() {
+  document.getElementById('host-section').style.display = state.isHost ? 'block' : 'none';
+  document.getElementById('guest-waiting').style.display = state.isHost ? 'none' : 'block';
+}
+
 function enterLobby(game) {
+  state.ended = false;
+  state.isHost = !!game.amHost;
+  state.round = game.round || 0;
+
   showScreen('screen-lobby');
   updateHeaderCode(state.code);
 
@@ -1263,34 +1438,34 @@ function enterLobby(game) {
   const url = location.origin + location.pathname + '?code=' + state.code;
   document.getElementById('lobby-url').textContent = url;
 
-  if (state.isHost) {
-    document.getElementById('host-section').style.display = 'block';
-    document.getElementById('guest-waiting').style.display = 'none';
-    document.getElementById('topic-input').value = '';
-    document.getElementById('topic-input').oninput = checkHostReady;
-    document.getElementById('start-btn').disabled = true;
-  } else {
-    document.getElementById('host-section').style.display = 'none';
-    document.getElementById('guest-waiting').style.display = 'block';
-  }
+  const topicInput = document.getElementById('topic-input');
+  topicInput.value = '';
+  topicInput.oninput = checkHostReady;
+  document.getElementById('start-btn').disabled = true;
+  applyLobbyRole();
 
-  renderPlayers(game.players, game.maxPlayers);
+  renderPlayers(game);
   startPolling();
 }
 
-function renderPlayers(players, maxPlayers) {
+function renderPlayers(game) {
+  const players = game.players;
   lobbyPlayerCount = players.length;
-  if (maxPlayers) lobbyMaxPlayers = maxPlayers;
+  lobbyRound = game.round || 0;
+  lobbyAllPresent = players.every(p => p.present !== false);
+  if (game.maxPlayers) lobbyMaxPlayers = game.maxPlayers;
   const list = document.getElementById('player-list');
   list.innerHTML = '';
   players.forEach(p => {
+    const away = p.present === false;
     const chip = document.createElement('div');
     chip.className = 'player-chip' +
       (p.isHost ? ' host' : '') +
-      (p.name === state.playerName ? ' me' : '');
+      (p.name === state.playerName ? ' me' : '') +
+      (away ? ' away' : '');
     chip.innerHTML = `
-      <div class="avatar">${p.name[0]}</div>
-      <span>${p.name}${p.isHost ? ' <i class="fa-solid fa-crown host-crown"></i>' : ''}${p.name === state.playerName ? ' (自分)' : ''}</span>
+      <div class="avatar">${esc(Array.from(p.name)[0] || '')}</div>
+      <span>${esc(p.name)}${p.isHost ? ' <i class="fa-solid fa-crown host-crown"></i>' : ''}${p.name === state.playerName ? ' (自分)' : ''}${away ? ' (戻り待ち)' : ''}</span>
     `;
     list.appendChild(chip);
   });
@@ -1317,6 +1492,21 @@ async function startGame() {
       topic,
     });
     enterDrawing(game.game);
+  } catch (e) {
+    toast('エラー: ' + e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function rematch() {
+  if (!state.code || !state.playerId) return;
+  setLoading(true, 'ルームに戻っています...');
+  try {
+    const data = await api('POST', `/api/game/${state.code}/rematch`, {
+      playerId: state.playerId,
+    });
+    enterLobby(data.game);
   } catch (e) {
     toast('エラー: ' + e.message, 'error');
   } finally {
@@ -1376,13 +1566,27 @@ function handleStateUpdate(game) {
   const currentScreen = document.querySelector('.screen.active')?.id;
 
   if (currentScreen === 'screen-lobby') {
-    renderPlayers(game.players, game.maxPlayers);
+    if (!!game.amHost !== state.isHost) {
+      state.isHost = !!game.amHost;
+      applyLobbyRole();
+    }
+    renderPlayers(game);
     if (game.status !== 'waiting') {
       if (game.myTurn) {
         enterDrawing(game);
       } else {
         showWaiting('ゲームが始まりました。あなたの番を待っています...');
       }
+    }
+    return;
+  }
+
+  if ((game.round || 0) > state.round) {
+    if (game.hasResult) {
+      stopPolling();
+      loadResult();
+    } else {
+      handleAborted({ abortedBy: null });
     }
     return;
   }
@@ -1432,7 +1636,7 @@ function enterDrawing(game) {
   const beginDraw = (elapsedInDrawMs) => {
     overlay.style.display = 'none';
     document.getElementById('ref-image').src = '';
-    drawArea.style.display = 'block';
+    drawArea.style.display = 'flex';
     title.innerHTML = '<i class="fa-solid fa-pencil"></i> 絵を描こう';
     drawCanvas = buildCanvas(document.getElementById('drawing-canvas-area'));
     runTimer({
@@ -1451,7 +1655,7 @@ function enterDrawing(game) {
       return;
     }
     drawArea.style.display = 'none';
-    overlay.style.display = 'block';
+    overlay.style.display = 'flex';
     title.innerHTML = '<i class="fa-solid fa-eye"></i> 絵を覚えよう';
     document.getElementById('ref-image').src = game.prevDrawing.imageData;
     runTimer({
@@ -1495,11 +1699,6 @@ function updateWaitingProgress(game) {
   const steps = document.getElementById('progress-steps');
   steps.innerHTML = '';
   game.players.forEach((p, i) => {
-    if (i > 0) {
-      const line = document.createElement('div');
-      line.className = 'step-line' + (game.drawingCount > i ? ' done' : '');
-      steps.appendChild(line);
-    }
     const dot = document.createElement('div');
     const isDone = i < game.drawingCount;
     const isCurrent = i === game.currentTurn;
@@ -1515,8 +1714,7 @@ function enterGuess(game) {
   stopTimer();
 
   const imageBox = document.getElementById('guess-image-box');
-  const field = document.getElementById('guess-field');
-  const btn = document.getElementById('guess-btn');
+  const inputArea = document.getElementById('guess-input-area');
   const img = document.getElementById('guess-image');
   const input = document.getElementById('guess-input');
   input.value = '';
@@ -1524,8 +1722,7 @@ function enterGuess(game) {
   const showInput = () => {
     imageBox.style.display = 'none';
     img.src = '';
-    field.style.display = 'block';
-    btn.style.display = 'flex';
+    inputArea.style.display = 'flex';
     document.getElementById('guess-timer-bar').style.display = 'none';
     input.focus();
   };
@@ -1536,9 +1733,8 @@ function enterGuess(game) {
     return;
   }
 
-  imageBox.style.display = 'block';
-  field.style.display = 'none';
-  btn.style.display = 'none';
+  imageBox.style.display = 'flex';
+  inputArea.style.display = 'none';
   document.getElementById('guess-timer-bar').style.display = 'flex';
   if (game.prevDrawing) img.src = game.prevDrawing.imageData;
 
@@ -1575,11 +1771,9 @@ async function loadResult() {
     const data = await api('GET', `/api/game/${state.code}/result`);
     stopPolling();
     stopTimer();
-    state.ended = true;
     showResult(data);
   } catch (e) {
     toast('エラー: ' + e.message, 'error');
-    setLoading(false);
   } finally {
     setLoading(false);
   }
@@ -1590,26 +1784,20 @@ function showResult(data) {
 
   const reveal = document.getElementById('result-reveal');
   reveal.innerHTML = `
-    <div class="verdict"><i class="fa-solid fa-palette"></i></div>
-    <h2>結果発表</h2>
-    <p style="color:var(--text-muted);margin-bottom:8px;">お題</p>
-    <div class="topic-chip">「${data.topic}」</div>
-    <p style="margin:10px 0 4px;font-size:0.85rem;color:var(--text-muted)">答え</p>
-    <div class="guess-chip">「${data.guess?.text || '(なし)'}」</div>
+    <h2><i class="fa-solid fa-palette"></i> 結果発表</h2>
+    <div class="reveal-item"><span>お題</span><div class="topic-chip">「${esc(data.topic || '')}」</div></div>
+    <div class="reveal-item"><span>答え</span><div class="guess-chip">「${esc(data.guess?.text || '(なし)')}」</div></div>
   `;
 
   const timeline = document.getElementById('timeline');
-  timeline.innerHTML = `<h3 style="margin-bottom:12px"><i class="fa-solid fa-scroll"></i> 絵の流れ</h3>`;
+  timeline.innerHTML = '';
 
   data.drawings.forEach((d, i) => {
     const item = document.createElement('div');
     item.className = 'timeline-item';
     item.innerHTML = `
-      <div class="who">
-        <span>${i + 1}番目</span>
-        <strong>${d.playerName}</strong>が描いた
-      </div>
-      <img src="${d.imageData}" alt="${d.playerName}の絵">
+      <div class="who">${i + 1}番目 <strong>${esc(d.playerName)}</strong>が描いた</div>
+      <div class="fit-img"><img src="${d.imageData}" alt="${esc(d.playerName)}の絵"></div>
     `;
     timeline.appendChild(item);
   });
@@ -1618,10 +1806,49 @@ function showResult(data) {
     const item = document.createElement('div');
     item.className = 'timeline-item';
     item.innerHTML = `
-      <div class="who"><strong>${data.guess.playerName}</strong>の答え</div>
-      <p style="font-size:1.4rem;font-weight:700;margin-top:8px">「${data.guess.text}」</p>
+      <div class="who"><strong>${esc(data.guess.playerName)}</strong>の答え</div>
+      <div class="answer-text">「${esc(data.guess.text)}」</div>
     `;
     timeline.appendChild(item);
+  }
+
+  requestAnimationFrame(fitTimeline);
+}
+
+function fitTimeline() {
+  const grid = document.getElementById('timeline');
+  const n = grid.children.length;
+  const W = grid.clientWidth;
+  const H = grid.clientHeight;
+  if (!n || !W || !H) return;
+
+  const gap = 8;
+  const caption = 40;
+  const ratio = CANVAS_W / CANVAS_H;
+  const minWidth = 120;
+
+  let best = { cols: 1, rows: n, width: 0 };
+  for (let cols = 1; cols <= n; cols++) {
+    const rows = Math.ceil(n / cols);
+    const cellW = (W - gap * (cols - 1)) / cols - 18;
+    const cellH = (H - gap * (rows - 1)) / rows - caption;
+    const width = Math.min(cellW, cellH * ratio);
+    if (width > best.width) best = { cols, rows, width };
+  }
+
+  if (best.width >= minWidth || n <= 2) {
+    grid.style.gridTemplateColumns = `repeat(${best.cols}, minmax(0, 1fr))`;
+    grid.style.gridTemplateRows = `repeat(${best.rows}, minmax(0, 1fr))`;
+    grid.style.gridAutoRows = '';
+    grid.style.overflowY = 'hidden';
+  } else {
+    const cols = Math.max(1, Math.floor((W + gap) / (minWidth + 18 + gap)));
+    const cellW = (W - gap * (cols - 1)) / cols;
+    const rowH = (cellW - 18) / ratio + caption;
+    grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+    grid.style.gridTemplateRows = '';
+    grid.style.gridAutoRows = Math.ceil(rowH) + 'px';
+    grid.style.overflowY = 'auto';
   }
 }
 
@@ -1634,9 +1861,11 @@ function resetGame() {
   sendLeave();
   stopPolling();
   stopTimer();
-  state = { code: null, playerId: null, playerName: null, isHost: false, pollTimer: null, ended: false };
+  state = { code: null, playerId: null, playerName: null, isHost: false, round: 0, pollTimer: null, ended: false };
   lobbyPlayerCount = 0;
   lobbyMaxPlayers = 0;
+  lobbyRound = 0;
+  lobbyAllPresent = true;
   drawCanvas = null;
   document.getElementById('header-code').style.display = 'none';
   document.getElementById('create-name').value = '';
